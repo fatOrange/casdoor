@@ -63,6 +63,18 @@ const SIGNIN_METHOD_KEYS = new Map<string, LoginMethod>([
   ["WeChat-None", "wechat"],
 ]);
 
+/**
+ * The items whose widgets the method tabs swap for one another: the WeChat and
+ * device tabs put their panel where the credential fields were. The branded shell
+ * renders them as one block so `reforge-auth.css` can reserve the method area's
+ * height and keep the card from resizing on the switch.
+ */
+const METHOD_ITEM_NAMES: Record<string, true> = {
+  Username: true,
+  Password: true,
+  "Verification code": true,
+};
+
 function getSigninMethods(application: any, type: string) {
   const methods: {value: LoginMethod; label: string}[] = [];
   const signinMethods = (application?.signinMethods ?? []) as any[];
@@ -1563,6 +1575,46 @@ export default function LoginPage({type = "login", application: applicationProp,
     </>
   );
 
+  /**
+   * The form items of the branded shell: the method area (the widgets the tabs swap,
+   * see METHOD_ITEM_NAMES) comes out as one wrapper, the rest of the items keep their
+   * configured order around it. The wrapper is what `reforge-auth.css` sizes, so the
+   * card stays the same height whether it holds the WeChat panel or the fields.
+   */
+  const renderReforgeItems = () => {
+    const nodes: React.ReactNode[] = [];
+    let methodItems: React.ReactNode[] = [];
+    const flushMethodItems = () => {
+      if (methodItems.length === 0) {
+        return;
+      }
+      nodes.push(
+        <div key={`method-area-${nodes.length}`} className="reforge-auth-method-area space-y-4">
+          {methodItems}
+        </div>,
+      );
+      methodItems = [];
+    };
+
+    signinItems.forEach((item: {name: string}) => {
+      if (item.name === "Providers" || item.name === "Signup link") {
+        return;
+      }
+      const node = renderSigninItem(item);
+      if (!node) {
+        return;
+      }
+      if (METHOD_ITEM_NAMES[item.name]) {
+        methodItems.push(node);
+      } else {
+        flushMethodItems();
+        nodes.push(node);
+      }
+    });
+    flushMethodItems();
+    return nodes;
+  };
+
   return (
     <AuthLayout
       preview={preview === "theme" ? "theme" : !!preview}
@@ -1615,9 +1667,7 @@ export default function LoginPage({type = "login", application: applicationProp,
 
         {showForm ? (
           <form className="space-y-4" onSubmit={submit}>
-            {signinItems.map((item) =>
-              reforge && (item.name === "Providers" || item.name === "Signup link") ? null : renderSigninItem(item),
-            )}
+            {reforge ? renderReforgeItems() : signinItems.map(renderSigninItem)}
             {reforge ? reforgeTail : null}
           </form>
         ) : (

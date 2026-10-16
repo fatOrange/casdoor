@@ -151,6 +151,11 @@ Switching between this application's sign-in and sign-up pages morphs the card
 over 240 ms and fades the form and illustration. Browsers without the View
 Transition API, or visitors who prefer reduced motion, switch without animation.
 
+The WeChat tab reserves a 230 × 230 loading slot and renders a QR code only after
+the real code arrives. The method fields have a minimum height that keeps the
+card steady when switching between WeChat and verification-code sign-in; longer
+fields and validation messages can still expand it.
+
 The shell uses local assets from `public/oneprep`, a fixed light palette and an
 English default with an application-scoped language choice. Its header logo is a
 neutral placeholder — a dashed, rounded 120 × 40 box reading "LOGO", which is

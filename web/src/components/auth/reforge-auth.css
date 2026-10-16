@@ -220,6 +220,18 @@ body.reforge-auth-active.theme-scope-light {
   min-width: 0;
 }
 
+/* The method area: the one wrapper the page puts around the widgets the sign-in tabs
+   swap for each other. The WeChat tab's panel is a fixed 278px (16px padding, the
+   230px QR slot, the 12px gap and the 20px refresh row), the credential tab's fields
+   160px plus the 40px submit and its 16px gap that a panel tab has no button for. Held
+   to the panel's height minus that submit block, the area is 278px in both tabs, so the
+   vertically centred card keeps its size and every shared control below the area stays
+   where it is when the tab switches. A floor rather than a height: a validation message
+   under a field still grows the card. */
+.reforge-auth .reforge-auth-form .reforge-auth-method-area {
+  min-height: 222px;
+}
+
 /* The reference text fields: 40px tall, 9px corners, an inset hairline instead
    of a border, and the cyan focus ring in place of the console's black one. */
 .reforge-auth .reforge-auth-form input:not([type="checkbox"]):not([type="radio"]),
@@ -294,7 +306,8 @@ body.reforge-auth-active.theme-scope-light {
 
 @media (max-width: 639.98px) {
   .reforge-auth .reforge-auth-form > *,
-  .reforge-auth .reforge-auth-form form > * {
+  .reforge-auth .reforge-auth-form form > *,
+  .reforge-auth .reforge-auth-form .reforge-auth-method-area > * {
     max-width: 100%;
   }
 }
