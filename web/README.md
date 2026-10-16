@@ -136,11 +136,16 @@ provision providers or change application configuration. Its provider row shows
 only the application's own configured providers; the reference Google, Microsoft
 and Apple placeholder buttons are not rendered.
 
-Direct entry points are `/login/application/dm01-reforge-login` and
-`/signup/dm01-reforge-login`. OAuth entry points keep their authorization query
-parameters when switching between sign-in and sign-up. `/login/organization_dm01`
-still opens that organization's configured default application, not necessarily
-this one.
+Use the existing `/login/oauth/authorize` entry with this application's `client_id`
+and complete OAuth query. Copy the sign-in URL from the application's Basic tab
+to use a registered redirect URI. Its `/signup/oauth/authorize` counterpart keeps
+the same query when switching between sign-in and sign-up.
+
+The original `/signup/dm01-reforge-login` route remains available, but without a
+stored OAuth sign-in URL or current OAuth query its return link follows the
+original `getLoginLink()` fallback; it cannot reconstruct a client callback.
+`/login/organization_dm01` still opens the organization's configured default
+application, not necessarily this one.
 
 Switching between this application's sign-in and sign-up pages morphs the card
 over 240 ms and fades the form and illustration. Browsers without the View

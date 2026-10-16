@@ -59,12 +59,8 @@ function fieldClass(field: string): string {
   return `signup-${FIELD_CLASS_NAMES[field] ?? field}`;
 }
 
-// a stored URL belongs to this application only by its named route or its client_id
+// a stored sign-in URL belongs to this application only by its client_id
 function signinUrlIsForApplication(url: string, application: {name: string; clientId?: string}): boolean {
-  if (url.startsWith("/login/application/")) {
-    const name = url.slice("/login/application/".length).split(/[/?#]/)[0];
-    return decodeURIComponent(name) === application.name;
-  }
   if (url.startsWith("/login/oauth/authorize")) {
     const query = url.indexOf("?");
     const clientId = query === -1 ? null : new URLSearchParams(url.slice(query)).get("client_id");
@@ -73,7 +69,9 @@ function signinUrlIsForApplication(url: string, application: {name: string; clie
   return false;
 }
 
-// /login/<owner> opens the owner's default application, not this one, so it is addressed by name
+// Only the OAuth entry is guaranteed to open this application, so reuse its client's query
+// when it is at hand — the stored sign-in URL, else the one the page was opened with — and
+// otherwise fall back to the original getLoginLink()
 function getReforgeSigninLink(application: {name: string; clientId?: string}): string {
   const stored = Setting.getStoredSigninUrl();
   if (stored !== "" && signinUrlIsForApplication(stored, application)) {

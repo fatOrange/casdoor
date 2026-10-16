@@ -37,7 +37,6 @@ import viCountries from "i18n-iso-countries/langs/vi.json";
 import zhCountries from "i18n-iso-countries/langs/zh.json";
 import * as Conf from "@/Conf";
 import {authConfig} from "@/auth/Auth";
-import {isReforgeApplication} from "@/lib/reforge-auth";
 import "@/i18n";
 
 export const ServerUrl = "";
@@ -2547,9 +2546,6 @@ export function getLoginLink(application) {
     url = window.location.pathname.replace("/signup/oauth/authorize", "/login/oauth/authorize");
   } else if (authConfig.appName === application.name) {
     url = "/login";
-  } else if (isReforgeApplication(application) && !application.signinUrl && !application.homepageUrl) {
-    // the re-forged application carries no links of its own; /login/<owner> would open another app
-    url = `/login/application/${encodeURIComponent(application.name)}`;
   } else if (application.signinUrl === "") {
     url = trim(application.homepageUrl, "/") + "/login";
   } else {

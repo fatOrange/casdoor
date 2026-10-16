@@ -130,8 +130,8 @@ function startReforgeTransition(navigate: NavigateFunction, url: string, page: R
 
 /**
  * Whether `target` opens `page` of this very application. Mirrors the URLs
- * Setting.getSignupLink() and Setting.getLoginLink() build for it: the named forms,
- * and the OAuth forms when the `client_id` is this application's own.
+ * Setting.getSignupLink() and Setting.getLoginLink() build for it: the signup's named
+ * forms, and both OAuth forms when the `client_id` is this application's own.
  */
 function isReforgeDestination(target: URL, page: ReforgeAuthPage, application: ReforgeTransitionApplication): boolean {
   const clientId = target.searchParams.get("client_id");
@@ -141,8 +141,7 @@ function isReforgeDestination(target: URL, page: ReforgeAuthPage, application: R
       (!!application.isShared && target.pathname === `/signup/${application.name}-org-${application.organization}`) ||
       (ownOAuthForm && target.pathname === "/signup/oauth/authorize");
   }
-  return target.pathname === `/login/application/${encodeURIComponent(application.name)}` ||
-    (ownOAuthForm && target.pathname === "/login/oauth/authorize");
+  return ownOAuthForm && target.pathname === "/login/oauth/authorize";
 }
 
 export function handleReforgeAuthTransitionClick(
