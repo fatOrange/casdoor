@@ -14,6 +14,8 @@ import {SearchableSelect} from "@/components/common/SearchableSelect";
 import {RegionSelect} from "@/components/common/RegionSelect";
 import {CustomHtml, CustomStyle} from "@/components/common/CustomHtml";
 import {isTrustedApplication} from "@/lib/custom-html";
+import {isReforgeApplication} from "@/lib/reforge-auth";
+import {handleReforgeAuthTransitionClick} from "@/lib/reforge-view-transition";
 import {AuthDivider, AuthLayout} from "@/components/auth/AuthLayout";
 import {AgreementCheckbox} from "@/components/auth/AgreementModal";
 import {ProviderButtons, getVisibleProviders} from "@/components/auth/ProviderButtons";
@@ -55,6 +57,33 @@ const FIELD_CLASS_NAMES: Record<string, string> = {
 
 function fieldClass(field: string): string {
   return `signup-${FIELD_CLASS_NAMES[field] ?? field}`;
+}
+
+// a stored URL belongs to this application only by its named route or its client_id
+function signinUrlIsForApplication(url: string, application: {name: string; clientId?: string}): boolean {
+  if (url.startsWith("/login/application/")) {
+    const name = url.slice("/login/application/".length).split(/[/?#]/)[0];
+    return decodeURIComponent(name) === application.name;
+  }
+  if (url.startsWith("/login/oauth/authorize")) {
+    const query = url.indexOf("?");
+    const clientId = query === -1 ? null : new URLSearchParams(url.slice(query)).get("client_id");
+    return clientId !== null && (clientId === application.clientId || clientId === application.name);
+  }
+  return false;
+}
+
+// /login/<owner> opens the owner's default application, not this one, so it is addressed by name
+function getReforgeSigninLink(application: {name: string; clientId?: string}): string {
+  const stored = Setting.getStoredSigninUrl();
+  if (stored !== "" && signinUrlIsForApplication(stored, application)) {
+    return stored;
+  }
+  const search = window.location.search;
+  if (new URLSearchParams(search).has("client_id")) {
+    return `/login/oauth/authorize${search}`;
+  }
+  return Setting.getLoginLink(application);
 }
 
 /** the application editor's live preview hands the form's own object over */
@@ -190,7 +219,10 @@ export default function SignupPage({application: applicationProp}: {application?
     );
   }
 
-  const signinLink = Setting.getStoredSigninUrl() || Setting.getLoginLink(application) || "/login";
+  const reforge = isReforgeApplication(application);
+  const signinLink = reforge
+    ? getReforgeSigninLink(application)
+    : Setting.getStoredSigninUrl() || Setting.getLoginLink(application) || "/login";
 
   // without self signup, only an invitation link opens the signup form
   if (!application.enableSignUp || (application.disableSelfSignup && !values.invitationCode)) {
@@ -606,7 +638,7 @@ export default function SignupPage({application: applicationProp}: {application?
           <ProviderButtons
             application={application}
             method="signup"
-            rule={Setting.getProvidersRule(application, item)}
+            rule={reforge ? "big" : Setting.getProvidersRule(application, item)}
             onBeforeClick={checkAgreement}
           />
         </div>
@@ -662,10 +694,16 @@ export default function SignupPage({application: applicationProp}: {application?
   // an application that lists no signup button at all still gets the default one
   const hasSignupButtonItem = signupItems.some((item: any) => item.name === "Signup button");
 
+  // the branded shell's own link back to the sign-in page: the transition
+  // navigates itself, and the link's URL stays the one the flow computed
+  const onSigninClick = (event: React.MouseEvent<HTMLAnchorElement>) =>
+    handleReforgeAuthTransitionClick(event, {navigate, application, from: "signup", enabled: !applicationProp});
+
   return (
     <AuthLayout
       preview={!!applicationProp}
       application={application}
+      authPage={reforge ? "signup" : undefined}
       wide
       hideLanguages={(languagesItem && !languagesItem.visible) || forcedLanguage !== ""}
       onLanguageChange={(key) => {
@@ -673,18 +711,27 @@ export default function SignupPage({application: applicationProp}: {application?
         Setting.setSigninLanguage(key);
       }}
       footer={
-        <>
-          {i18next.t("signup:Have account?")}{" "}
-          {signinLink.startsWith("/") ? (
-            <Link to={signinLink} className="signup-link font-medium text-foreground underline-offset-4 hover:underline">
-              {i18next.t("signup:sign in now")}
+        reforge ? (
+          <p className="reforge-auth-signup-row">
+            {i18next.t("reforge:Already have an account?")}{" "}
+            <Link to={signinLink} className="reforge-auth-link signup-link" onClick={onSigninClick}>
+              {i18next.t("reforge:Sign in")}
             </Link>
-          ) : (
-            <a href={signinLink} className="signup-link font-medium text-foreground underline-offset-4 hover:underline">
-              {i18next.t("signup:sign in now")}
-            </a>
-          )}
-        </>
+          </p>
+        ) : (
+          <>
+            {i18next.t("signup:Have account?")}{" "}
+            {signinLink.startsWith("/") ? (
+              <Link to={signinLink} className="signup-link font-medium text-foreground underline-offset-4 hover:underline">
+                {i18next.t("signup:sign in now")}
+              </Link>
+            ) : (
+              <a href={signinLink} className="signup-link font-medium text-foreground underline-offset-4 hover:underline">
+                {i18next.t("signup:sign in now")}
+              </a>
+            )}
+          </>
+        )
       }
     >
       <form className="space-y-4" onSubmit={submit}>

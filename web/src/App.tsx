@@ -221,6 +221,7 @@ export default function App() {
         {/* Authentication */}
         <Route path="/login" element={<LoginPage type="login" />} />
         <Route path="/login/:owner" element={<LoginPage type="login" />} />
+        <Route path="/login/application/:applicationName" element={<LoginPage type="login" />} />
         <Route path="/login/oauth/authorize" element={<LoginPage type="code" />} />
         <Route path="/login/oauth/device/:userCode" element={<LoginPage type="device" />} />
         <Route path="/login/saml/authorize/:owner/:applicationName" element={<LoginPage type="saml" />} />

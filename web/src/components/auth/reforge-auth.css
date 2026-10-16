@@ -1,0 +1,486 @@
+/* The Zhikaoya sign-in / sign-up shell, transcribed from the reference capture of
+   the live page (oneprep-anlysis/chunks/signin/signin.css) with every rule scoped
+   to `.reforge-auth` and every asset served from `public/oneprep`. */
+
+/* the reference's variable Inter */
+@font-face {
+  font-family: "Inter";
+  src: url("/oneprep/inter-var.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Arial");
+  ascent-override: 89.79%;
+  descent-override: 22.36%;
+  line-gap-override: 0%;
+  size-adjust: 107.89%;
+}
+
+/* the reference's light tokens, kept here rather than read from the app theme */
+.reforge-auth {
+  --reforge-page-background: #fcfcfc;
+  --reforge-card-surface: #ffffffb3;
+  --reforge-link-color: #1cb0f6;
+  --reforge-link-underline-color: #1cb0f666;
+  --reforge-gray-11: #646464;
+  --reforge-gray-12: #202020;
+  --reforge-gray-a3: #0000000f;
+  --reforge-gray-a7: #00000031;
+  --reforge-gray-a11: #0000009b;
+  --reforge-focus-8: #26b5fb;
+  --reforge-font-family: "Inter", "Inter Fallback", -apple-system, BlinkMacSystemFont,
+    "Segoe UI (Custom)", Roboto, "Helvetica Neue", "Open Sans (Custom)", system-ui,
+    sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+
+  box-sizing: border-box;
+  min-height: 100dvh;
+  background-color: var(--reforge-page-background);
+  color: var(--reforge-gray-12);
+  font-family: var(--reforge-font-family);
+  color-scheme: light;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* `.theme-scope-light` takes its primary and ring from `--primary-base`, which
+   the console or another application may have left on the document root; pinned
+   to the reference palette here, at a specificity that shared rule loses to. The
+   body selector is the same palette lent to portaled menus and dialogs while a
+   flow is open — see `enterFlow` in ReforgeAuthLayout.tsx. */
+.reforge-auth.theme-scope-light,
+body.reforge-auth-active.theme-scope-light {
+  --primary-base: 0 0% 0%;
+  --primary-base-foreground: 0 0% 98%;
+  --primary: 0 0% 0%;
+  --primary-foreground: 0 0% 98%;
+  --ring: 200 96% 57%;
+  --radius: 0.5rem;
+}
+
+.reforge-auth .reforge-auth-page {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 100dvh;
+  width: 100%;
+  max-width: 100vw;
+}
+
+.reforge-auth .reforge-auth-background {
+  position: relative;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 440px);
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  width: 100%;
+  max-width: 100vw;
+  padding: 16px;
+  overflow-x: hidden;
+  background-color: var(--reforge-page-background);
+  color: var(--reforge-gray-12);
+}
+
+.reforge-auth .reforge-auth-topbar {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+}
+.reforge-auth .reforge-auth-lang-select {
+  box-sizing: border-box;
+  height: 32px;
+  max-width: 180px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 9px;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--reforge-gray-11);
+  background-color: #ffffffcc;
+  box-shadow: rgba(0, 0, 0, 0.192) 0 0 0 1px inset;
+  cursor: pointer;
+}
+.reforge-auth .reforge-auth-lang-select:hover {
+  background-color: #ffffff;
+  color: var(--reforge-gray-12);
+}
+.reforge-auth .reforge-auth-lang-select:focus-visible {
+  outline: 2px solid var(--reforge-focus-8);
+  outline-offset: 2px;
+}
+
+.reforge-auth .reforge-auth-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  /* room for the absolutely placed legal footer */
+  padding: 16px 0 88px;
+}
+
+.reforge-auth .reforge-auth-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+/* the neutral stand-in for the brand logo until the real asset lands */
+.reforge-auth .reforge-auth-logo {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 40px;
+  border: 1px dashed var(--reforge-gray-a7);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--reforge-gray-11);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.reforge-auth .reforge-auth-heading {
+  margin: 0;
+  font-family: var(--reforge-font-family);
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 30px;
+  letter-spacing: -0.15px;
+  text-align: center;
+  color: var(--reforge-gray-12);
+  text-wrap: balance;
+}
+
+/* the surface is painted on the card itself; on a negative-z-index ::before it
+   would fall behind the column's own background and never show */
+.reforge-auth .reforge-auth-card {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 32px;
+  border-radius: 18px;
+  overflow: hidden;
+  background-color: var(--reforge-card-surface);
+}
+.reforge-auth .reforge-auth-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow: oklab(0.664389 0.0000303329 0.0000133211 / 0.341176) 0 0 0 1px inset;
+}
+@media (min-width: 1024px) {
+  .reforge-auth .reforge-auth-card {
+    padding: 48px;
+    border-radius: 24px;
+  }
+}
+
+.reforge-auth .reforge-auth-back {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  color: var(--reforge-gray-11);
+  background-color: transparent;
+  cursor: pointer;
+}
+.reforge-auth .reforge-auth-back:hover {
+  color: var(--reforge-gray-12);
+  background-color: var(--reforge-gray-a3);
+}
+.reforge-auth .reforge-auth-back:focus-visible {
+  outline: 2px solid var(--reforge-focus-8);
+  outline-offset: 2px;
+}
+.reforge-auth .reforge-auth-back svg {
+  width: 16px;
+  height: 16px;
+}
+
+.reforge-auth .reforge-auth-form {
+  width: 100%;
+  min-width: 0;
+}
+
+/* The reference text fields: 40px tall, 9px corners, an inset hairline instead
+   of a border, and the cyan focus ring in place of the console's black one. */
+.reforge-auth .reforge-auth-form input:not([type="checkbox"]):not([type="radio"]),
+.reforge-auth .reforge-auth-form [role="combobox"] {
+  min-height: 2.5rem;
+  border: 0;
+  border-radius: 9px;
+  background-color: #ffffffd9;
+  color: var(--reforge-gray-12);
+  box-shadow: rgba(0, 0, 0, 0.192) 0 0 0 1px inset;
+  font-size: 16px;
+  transition: box-shadow 0.18s ease;
+}
+.reforge-auth .reforge-auth-form input:not([type="checkbox"]):not([type="radio"]):focus-visible,
+.reforge-auth .reforge-auth-form [role="combobox"]:focus-visible {
+  outline: 2px solid var(--reforge-focus-8);
+  outline-offset: -1px;
+  box-shadow: rgba(0, 0, 0, 0.192) 0 0 0 1px inset;
+}
+
+/* field labels, the reference's 14px/600; checkbox rows opt out with font-normal */
+.reforge-auth .reforge-auth-form label:not(.font-normal) {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  color: var(--reforge-gray-12);
+}
+
+/* The reference's primary button: pure black, white label, its own hover, and a
+   disabled state that stays legible. Only submits wear it — the password
+   toggle, the code button and the providers keep their own look. */
+.reforge-auth .reforge-auth-form button[type="submit"] {
+  min-height: 2.5rem;
+  border: 0;
+  border-radius: 9px;
+  background-color: #000000;
+  color: #ffffff;
+  box-shadow: none;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  transition: background-color 0.15s ease;
+}
+.reforge-auth .reforge-auth-form button[type="submit"]:hover {
+  background-color: #2e2e2e;
+}
+.reforge-auth .reforge-auth-form button[type="submit"]:active {
+  background-color: #414141;
+}
+.reforge-auth .reforge-auth-form button[type="submit"]:focus-visible {
+  outline: 2px solid var(--reforge-focus-8);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+.reforge-auth .reforge-auth-form button[type="submit"]:disabled {
+  opacity: 1;
+  color: var(--reforge-gray-a7);
+  background-color: var(--reforge-gray-a3);
+  box-shadow: none;
+}
+/* a submit that is only disabled because it is working keeps the black */
+.reforge-auth .reforge-auth-form button[type="submit"]:disabled:has(.animate-spin) {
+  color: #ffffff;
+  background-color: #000000;
+}
+
+/* the other full-width buttons match the height and corners of the fields */
+.reforge-auth .reforge-auth-form button.w-full {
+  min-height: 2.5rem;
+  border-radius: 9px;
+}
+
+@media (max-width: 639.98px) {
+  .reforge-auth .reforge-auth-form > *,
+  .reforge-auth .reforge-auth-form form > * {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 359.98px) {
+  .reforge-auth:has(.reforge-auth-topbar) .reforge-auth-content {
+    padding-top: 48px;
+  }
+}
+
+/* The sign-in row sits in the page's own `space-y-*` stack, whose generated
+   `.space-y-4 > :not([hidden]) ~ :not([hidden])` margin outranks a two-class
+   selector, so the row is qualified down to the element it is. */
+.reforge-auth .reforge-auth-form p.reforge-auth-signup-row,
+.reforge-auth .reforge-auth-footer {
+  margin: 24px 0 0;
+  padding: 0;
+  text-align: center;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--reforge-gray-a11);
+}
+
+.reforge-auth .reforge-auth-signup-row a,
+.reforge-auth .reforge-auth-footer a,
+.reforge-auth .reforge-auth-link {
+  color: var(--reforge-link-color);
+  text-decoration-line: none;
+  text-decoration-color: var(--reforge-link-underline-color);
+  text-decoration-thickness: min(2px, max(1px, 0.05em));
+  text-underline-offset: 2px;
+}
+.reforge-auth .reforge-auth-signup-row a:hover,
+.reforge-auth .reforge-auth-footer a:hover,
+.reforge-auth .reforge-auth-link:hover {
+  text-decoration-line: underline;
+}
+.reforge-auth .reforge-auth-signup-row a:focus-visible,
+.reforge-auth .reforge-auth-footer a:focus-visible,
+.reforge-auth .reforge-auth-link:focus-visible {
+  outline: 2px solid var(--reforge-focus-8);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.reforge-auth .reforge-auth-legal {
+  position: absolute;
+  bottom: 16px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  max-width: 340px;
+  font-size: 14px;
+  line-height: 20px;
+  text-align: center;
+  color: var(--reforge-gray-a11);
+}
+.reforge-auth .reforge-auth-legal a {
+  color: inherit;
+  text-decoration: none;
+}
+.reforge-auth .reforge-auth-legal a:hover {
+  color: var(--reforge-gray-12);
+  text-decoration: underline;
+}
+
+.reforge-auth .reforge-auth-illustration {
+  display: none;
+}
+@media (min-width: 768px) {
+  .reforge-auth:not([data-page="signup"]) .reforge-auth-page {
+    grid-template-columns: 1fr 1fr;
+  }
+  .reforge-auth .reforge-auth-illustration {
+    position: relative;
+    display: block;
+    min-height: 100dvh;
+  }
+  /* stays in view while a tall form scrolls */
+  .reforge-auth .reforge-auth-illustration-inner {
+    position: sticky;
+    top: 0;
+    height: calc(100dvh - 32px);
+    margin: 16px;
+    border-radius: 24px;
+    overflow: hidden;
+  }
+  .reforge-auth .reforge-auth-illustration-inner > img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* the Great Wave sits left of center; keep it in frame when a tall
+       viewport crops the panel's sides */
+    object-position: 40% 50%;
+    transform: scale(1.08);
+  }
+}
+
+/* ---------- sign-in ↔ sign-up view transition, mirroring oneprep-anlysis/chunks/
+   signin/signin.css:554-631. Names exist only while the coordinator's marker is
+   up on a real, non-preview shell, so an editor preview can never duplicate one. */
+
+html[data-reforge-auth-transition] body.reforge-auth-active .reforge-auth-background   { view-transition-name: reforge-background; }
+html[data-reforge-auth-transition] body.reforge-auth-active .reforge-auth-topbar       { view-transition-name: reforge-topbar; }
+html[data-reforge-auth-transition] body.reforge-auth-active .reforge-auth-content      { view-transition-name: reforge-page-content; }
+html[data-reforge-auth-transition] body.reforge-auth-active .reforge-auth-heading      { view-transition-name: reforge-heading; }
+html[data-reforge-auth-transition] body.reforge-auth-active .reforge-auth-card         { view-transition-name: reforge-card; }
+html[data-reforge-auth-transition] body.reforge-auth-active .reforge-auth-form         { view-transition-name: reforge-card-content; }
+html[data-reforge-auth-transition] body.reforge-auth-active .reforge-auth-signup-row   { view-transition-name: reforge-footer; }
+html[data-reforge-auth-transition] body.reforge-auth-active .reforge-auth-legal        { view-transition-name: reforge-legal-copy; }
+html[data-reforge-auth-transition] body.reforge-auth-active .reforge-auth-illustration { view-transition-name: reforge-secondary-panel; }
+html[data-reforge-auth-transition] body.reforge-auth-active .reforge-auth-heading,
+html[data-reforge-auth-transition] body.reforge-auth-active .reforge-auth-card,
+html[data-reforge-auth-transition] body.reforge-auth-active .reforge-auth-form,
+html[data-reforge-auth-transition] body.reforge-auth-active .reforge-auth-signup-row,
+html[data-reforge-auth-transition] body.reforge-auth-active .reforge-auth-illustration {
+  view-transition-class: reforge-step-morph;
+}
+
+html[data-reforge-auth-transition]::view-transition-group(*) {
+  animation-duration: 0.24s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+html[data-reforge-auth-transition]::view-transition-group(reforge-background),
+html[data-reforge-auth-transition]::view-transition-group(reforge-secondary-panel) {
+  animation-timing-function: step-end;
+}
+html[data-reforge-auth-transition]::view-transition-old(reforge-card-content),
+html[data-reforge-auth-transition]::view-transition-old(reforge-secondary-panel),
+html[data-reforge-auth-transition]::view-transition-old(reforge-background) {
+  animation: reforge-step-fade-out 0.1s ease-out both;
+}
+html[data-reforge-auth-transition]::view-transition-new(reforge-card-content),
+html[data-reforge-auth-transition]::view-transition-new(reforge-secondary-panel),
+html[data-reforge-auth-transition]::view-transition-new(reforge-background) {
+  animation: reforge-step-fade-in 0.1s ease-out 0.24s both;
+}
+html[data-reforge-auth-transition]::view-transition-new(reforge-background),
+html[data-reforge-auth-transition]::view-transition-old(reforge-background) {
+  object-fit: cover;
+}
+/* the old copy is dropped and the new one shown at once: no copy twice on screen */
+html[data-reforge-auth-transition]::view-transition-old(reforge-page-content),
+html[data-reforge-auth-transition]::view-transition-old(reforge-heading),
+html[data-reforge-auth-transition]::view-transition-old(reforge-footer),
+html[data-reforge-auth-transition]::view-transition-old(reforge-legal-copy),
+html[data-reforge-auth-transition]::view-transition-old(reforge-topbar) {
+  animation: none;
+  opacity: 0;
+}
+html[data-reforge-auth-transition]::view-transition-new(reforge-page-content),
+html[data-reforge-auth-transition]::view-transition-new(reforge-heading),
+html[data-reforge-auth-transition]::view-transition-new(reforge-footer),
+html[data-reforge-auth-transition]::view-transition-new(reforge-legal-copy),
+html[data-reforge-auth-transition]::view-transition-new(reforge-topbar) {
+  animation: none;
+  opacity: 1;
+}
+html[data-reforge-auth-transition]::view-transition-group(root) {
+  animation: none;
+}
+html[data-reforge-auth-transition]::view-transition-old(root) {
+  animation: none;
+  opacity: 0;
+}
+html[data-reforge-auth-transition]::view-transition-new(root) {
+  animation: none;
+  opacity: 1;
+}
+html[data-reforge-auth-transition]::view-transition-old(.reforge-step-morph),
+html[data-reforge-auth-transition]::view-transition-new(.reforge-step-morph) {
+  height: 100%;
+}
+
+@keyframes reforge-step-fade-in { 0% { opacity: 0; } }
+@keyframes reforge-step-fade-out { to { opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-reforge-auth-transition]::view-transition-group(*),
+  html[data-reforge-auth-transition]::view-transition-old(*),
+  html[data-reforge-auth-transition]::view-transition-new(*) {
+    animation: none !important;
+  }
+  html[data-reforge-auth-transition]::view-transition-old(*) {
+    opacity: 0 !important;
+  }
+}

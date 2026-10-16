@@ -1420,6 +1420,18 @@
     "Object": "オブジェクト",
     "Response": "レスポンス"
   },
+  "reforge": {
+    "Already have an account?": "アカウントはありますか？",
+    "By creating an account, you agree to the": "アカウントを作成すると、以下に同意したものとみなされます：",
+    "Create a free account": "無料アカウントを作成",
+    "Don't have an account?": "アカウントがありませんか？",
+    "Privacy Policy": "プライバシーポリシー",
+    "Sign in": "サインイン",
+    "Sign in to OnePrep": "OnePrep にサインイン",
+    "Sign up": "サインアップ",
+    "Terms of Service": "利用規約",
+    "and": "と"
+  },
   "resource": {
     "Copy Link": "コピー リンク",
     "File name": "ファイル名",

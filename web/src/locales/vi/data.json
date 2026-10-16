@@ -1420,6 +1420,18 @@
     "Object": "Đối tượng",
     "Response": "Phản hồi"
   },
+  "reforge": {
+    "Already have an account?": "Có tài khoản không?",
+    "By creating an account, you agree to the": "Bằng cách tạo tài khoản, bạn đồng ý với",
+    "Create a free account": "Tạo tài khoản miễn phí",
+    "Don't have an account?": "Không có tài khoản?",
+    "Privacy Policy": "Chính sách bảo mật",
+    "Sign in": "Đăng nhập",
+    "Sign in to OnePrep": "Đăng nhập vào OnePrep",
+    "Sign up": "Đăng ký",
+    "Terms of Service": "Điều khoản dịch vụ",
+    "and": "và"
+  },
   "resource": {
     "Copy Link": "Sao chép liên kết",
     "File name": "Tên tập tin",

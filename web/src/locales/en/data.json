@@ -1420,6 +1420,18 @@
     "Object": "Object",
     "Response": "Response"
   },
+  "reforge": {
+    "Already have an account?": "Already have an account?",
+    "By creating an account, you agree to the": "By creating an account, you agree to the",
+    "Create a free account": "Create a free account",
+    "Don't have an account?": "Don’t have an account?",
+    "Privacy Policy": "Privacy Policy",
+    "Sign in": "Sign in",
+    "Sign in to OnePrep": "Sign in to OnePrep",
+    "Sign up": "Sign up",
+    "Terms of Service": "Terms of Service",
+    "and": "and"
+  },
   "resource": {
     "Copy Link": "Copy Link",
     "File name": "File name",

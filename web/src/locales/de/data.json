@@ -1420,6 +1420,18 @@
     "Object": "Objekt",
     "Response": "Antwort"
   },
+  "reforge": {
+    "Already have an account?": "Haben Sie ein Konto?",
+    "By creating an account, you agree to the": "Mit der Erstellung eines Kontos stimmen Sie den",
+    "Create a free account": "Kostenloses Konto erstellen",
+    "Don't have an account?": "Kein Konto?",
+    "Privacy Policy": "Datenschutzerklärung",
+    "Sign in": "Anmelden",
+    "Sign in to OnePrep": "Bei OnePrep anmelden",
+    "Sign up": "Registrieren",
+    "Terms of Service": "Nutzungsbedingungen",
+    "and": "und"
+  },
   "resource": {
     "Copy Link": "Kopiere den Link",
     "File name": "Dateiname",

@@ -1420,6 +1420,18 @@
     "Object": "Об'єкт",
     "Response": "Відповідь"
   },
+  "reforge": {
+    "Already have an account?": "Є акаунт?",
+    "By creating an account, you agree to the": "Створюючи акаунт, ви погоджуєтеся з",
+    "Create a free account": "Створити безкоштовний акаунт",
+    "Don't have an account?": "Немає облікового запису?",
+    "Privacy Policy": "Політика конфіденційності",
+    "Sign in": "Увійти",
+    "Sign in to OnePrep": "Увійти в OnePrep",
+    "Sign up": "Зареєструватися",
+    "Terms of Service": "Умови використання",
+    "and": "та"
+  },
   "resource": {
     "Copy Link": "Копіювати посилання",
     "File name": "Ім'я файлу",

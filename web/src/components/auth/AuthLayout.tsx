@@ -6,7 +6,9 @@ import {Button} from "@/components/ui/button";
 import {LanguageSelect} from "@/components/common/LanguageSelect";
 import {ThemeToggle} from "@/components/common/ThemeToggle";
 import {CustomHtml, CustomStyle} from "@/components/common/CustomHtml";
+import {ReforgeAuthLayout} from "@/components/auth/ReforgeAuthLayout";
 import {getSafeHtml, isTrustedApplication} from "@/lib/custom-html";
+import {isReforgeApplication} from "@/lib/reforge-auth";
 import {
   getOrganizationCookieChrome,
   useApplicationHelmet,
@@ -42,6 +44,12 @@ interface AuthLayoutProps {
    * of its own, the Marketplace's theme preview, so the theme is applied there.
    */
   preview?: boolean | "theme";
+  /**
+   * Which of the reforge application's branded pages this is. Only the reforge
+   * application paints the OnePrep shell, and only when the page names itself:
+   * every other page, and every other application, keeps this layout untouched.
+   */
+  authPage?: "signin" | "signup";
 }
 
 /** The "we cannot sign you in" panel, port of auth/Util.js renderMessageLarge(). */
@@ -173,9 +181,13 @@ export function AuthLayout({
   onBack,
   footer,
   preview,
+  authPage,
 }: AuthLayoutProps) {
   const themePreview = preview === "theme";
-  useApplicationTheme(application, !preview || themePreview);
+  // the OnePrep shell paints its own light palette, so the application theme must
+  // not restyle the panel — or the console variables — underneath it
+  const reforgePage = isReforgeApplication(application) ? authPage : undefined;
+  useApplicationTheme(application, !reforgePage && (!preview || themePreview));
   // an application can force the dark palette regardless of the visitor's own
   // preference, and the logo has to follow the palette that is actually painted
   const isDark = useIsDark();
@@ -201,6 +213,25 @@ export function AuthLayout({
   const ipRestriction = application?.ipRestriction || application?.organizationObj?.ipRestriction;
   if (ipRestriction) {
     return <BlockedMessage message={ipRestriction} />;
+  }
+
+  // the reforge application's two branded pages paint the OnePrep shell around
+  // their own form markup; every other page keeps this layout, and the IP
+  // restriction above has already had its say
+  if (reforgePage) {
+    return (
+      <ReforgeAuthLayout
+        application={application}
+        authPage={reforgePage}
+        className={className}
+        footer={footer}
+        onLanguageChange={onLanguageChange}
+        onBack={onBack}
+        preview={!!preview}
+      >
+        {children}
+      </ReforgeAuthLayout>
+    );
   }
 
   // the customized form styling is meant for the standalone page, an embedded

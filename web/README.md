@@ -116,12 +116,49 @@ sign up from `signupItems`, forgot password, `/callback` (OAuth, OIDC, SAML POST
 binding, CAS, Telegram, Steam), MFA second factor + recovery
 code, consent, prompt, result.
 
+The page opens on the first method the application can actually offer: a hidden
+method or one without a tab (WeChat set to "Login page", the device tab on the
+device page) does not decide it, so an application that lists WeChat first opens
+on its WeChat tab instead of a password form it does not offer.
+
 The sign-in page honours `orgChoiceMode`, so an application can ask which
 organization the visitor belongs to first; a visitor already signed in to that
 organization gets a one-click "continue as" panel above the form, which is how
 an OAuth or device request is approved. Sign-up runs the same client-side rules
 the antd Form does — each signup item's own `regex` included — and reports them
 in Casdoor's own wording rather than the browser's.
+
+**智考鸭 presentation** — Only `organization_dm01/dm01-reforge-login` uses the
+custom sign-in/sign-up shell, with the fixed sign-in heading `登录智考鸭`.
+It keeps the application's existing fields, validation, WeChat/phone sign-in
+and authentication requests; it does not
+provision providers or change application configuration. Its provider row shows
+only the application's own configured providers; the reference Google, Microsoft
+and Apple placeholder buttons are not rendered.
+
+Direct entry points are `/login/application/dm01-reforge-login` and
+`/signup/dm01-reforge-login`. OAuth entry points keep their authorization query
+parameters when switching between sign-in and sign-up. `/login/organization_dm01`
+still opens that organization's configured default application, not necessarily
+this one.
+
+Switching between this application's sign-in and sign-up pages morphs the card
+over 240 ms and fades the form and illustration. Browsers without the View
+Transition API, or visitors who prefer reduced motion, switch without animation.
+
+The shell uses local assets from `public/oneprep`, a fixed light palette and an
+English default with an application-scoped language choice. Its header logo is a
+neutral placeholder — a dashed, rounded 120 × 40 box reading "LOGO", which is
+also its accessible name — rather than a brand mark. Embedded previews leave the
+console language alone; leaving the standalone flow restores the visitor's
+previous language. Actual verification delivery still requires the appropriate
+Email/SMS providers.
+
+The sign-in illustration is a local 1600 × 1097 WebP of Katsushika Hokusai's
+*The Great Wave off Kanagawa*, from the
+[Art Institute of Chicago's public-domain collection](https://www.artic.edu/artworks/24645).
+It uses a cover crop focused on the wave, enlarged by 8% to hide the artwork's
+top and bottom borders; no external image request is needed.
 
 **Captcha** — the full rule handling of the antd frontend (`Never` / `Always` /
 `Dynamic` / `Internet-Only`), as a dialog or inline in the sign-in form, for both

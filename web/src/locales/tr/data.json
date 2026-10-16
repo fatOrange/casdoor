@@ -1420,6 +1420,18 @@
     "Object": "Nesne",
     "Response": "Yanıt"
   },
+  "reforge": {
+    "Already have an account?": "Zaten bir hesabınız var mı?",
+    "By creating an account, you agree to the": "Hesap oluşturarak şunları kabul etmiş olursunuz:",
+    "Create a free account": "Ücretsiz hesap oluştur",
+    "Don't have an account?": "Hesabınız yok mu?",
+    "Privacy Policy": "Gizlilik Politikası",
+    "Sign in": "Oturum aç",
+    "Sign in to OnePrep": "OnePrep'e giriş yap",
+    "Sign up": "Kaydol",
+    "Terms of Service": "Kullanım Koşulları",
+    "and": "ve"
+  },
   "resource": {
     "Copy Link": "Bağlantıyı Kopyala",
     "File name": "Dosya adı",

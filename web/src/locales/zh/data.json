@@ -1420,6 +1420,18 @@
     "Object": "实体",
     "Response": "响应"
   },
+  "reforge": {
+    "Already have an account?": "已有账号？",
+    "By creating an account, you agree to the": "创建账号即表示您同意",
+    "Create a free account": "免费创建账号",
+    "Don't have an account?": "没有账号？",
+    "Privacy Policy": "隐私政策",
+    "Sign in": "登录",
+    "Sign in to OnePrep": "登录 OnePrep",
+    "Sign up": "注册",
+    "Terms of Service": "服务条款",
+    "and": "和"
+  },
   "resource": {
     "Copy Link": "复制链接",
     "File name": "文件名",

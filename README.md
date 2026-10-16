@@ -205,6 +205,16 @@ Set `driverName`, `dataSourceName` and `dbName` in [`conf/app.conf`](conf/app.co
 cd web && yarn install && yarn build && cd .. && go run main.go
 ```
 
+For PostgreSQL, configure the full connection string, including the database name:
+
+```ini
+driverName = postgres
+dataSourceName = "user=casdoor password=your_password host=127.0.0.1 port=5432 dbname=casdoor sslmode=disable"
+dbName = casdoor
+```
+
+Use `sslmode=disable` only for development or a trusted connection; configure TLS as required for production. To create the database on startup, run `go run . -createDatabase=true` with an account that has permission to create databases. Otherwise, create the database beforehand and run `go run .`. The startup connection to the `postgres` maintenance database preserves the other connection parameters, including `sslmode`.
+
 While working on the frontend, run `yarn start` in [`web/`](web) instead of `yarn build` to get hot reload on port 7001, with `go run main.go` serving the API from a second terminal.
 
 Guide: [Server installation](https://casdoor.ai/docs/basic/server-installation)

@@ -10,6 +10,8 @@ import {Alert, AlertDescription} from "@/components/ui/alert";
 import {Loading} from "@/components/common/Loading";
 import {CustomHtml, CustomStyle} from "@/components/common/CustomHtml";
 import {isTrustedApplication} from "@/lib/custom-html";
+import {isReforgeApplication} from "@/lib/reforge-auth";
+import {handleReforgeAuthTransitionClick} from "@/lib/reforge-view-transition";
 import {AuthDivider, AuthLayout} from "@/components/auth/AuthLayout";
 import {SigninMethodTabs} from "@/components/auth/SigninMethodTabs";
 import {MfaVerify, NextMfa, RequiredMfa} from "@/components/auth/MfaVerify";
@@ -38,41 +40,10 @@ import * as AuthBackend from "@/backend/AuthBackend";
 import * as UserBackend from "@/backend/UserBackend";
 import * as OrganizationBackend from "@/backend/OrganizationBackend";
 import * as Setting from "@/lib/setting";
+import {cn} from "@/lib/utils";
 
 type LoginType = "login" | "code" | "cas" | "saml" | "device";
 type LoginMethod = "password" | "verificationCode" | "verificationCodeEmail" | "verificationCodePhone" | "ldap" | "webAuthn" | "wechat" | "faceId" | "magicLink" | "device";
-
-function getDefaultLoginMethod(application: any): LoginMethod {
-  const first = application?.signinMethods?.[0];
-  switch (first?.name) {
-  case "Password":
-    return "password";
-  case "Verification code":
-    switch (first?.rule) {
-    case "All":
-      return "verificationCode";
-    case "Email only":
-      return "verificationCodeEmail";
-    case "Phone only":
-      return "verificationCodePhone";
-    }
-    break;
-  case "LDAP":
-    return "ldap";
-  case "WebAuthn":
-    return "webAuthn";
-  case "Face ID":
-    return "faceId";
-  case "Magic link":
-    return "magicLink";
-  case "Device login":
-    if (first?.rule === "Tab") {
-      return "device";
-    }
-    break;
-  }
-  return "password";
-}
 
 /**
  * The method strip of the antd page: the application lists its sign-in methods in
@@ -337,7 +308,9 @@ export default function LoginPage({type = "login", application: applicationProp,
       }
       setApplication(app);
       setCountryCode(app?.organizationObj?.countryCodes?.[0] ?? "");
-      setLoginMethod(getDefaultLoginMethod(app));
+      // the opening method is the first the tab strip can show: a hidden or
+      // tab-less one never decides it, and with none showable password stays
+      setLoginMethod(getSigninMethods(app, type)[0]?.value ?? "password");
       setAgreed(true);
       setAutoSignin(Setting.getAutoSigninDefaultValue(app));
     };
@@ -1237,6 +1210,8 @@ export default function LoginPage({type = "login", application: applicationProp,
     );
   }
 
+  // brand the plain sign-in and OAuth authorize pages only, never device/CAS/SAML
+  const reforge = (type === "login" || type === "code") && isReforgeApplication(application);
   const captchaProvider = getCaptchaProvider(application);
   const passwordEnabled = Setting.isPasswordEnabled(application);
   const codeEnabled = Setting.isCodeSigninEnabled(application);
@@ -1528,13 +1503,31 @@ export default function LoginPage({type = "login", application: applicationProp,
         return null;
       }
       const signupUrl = Setting.getSignupLink(application) ?? "/signup";
-      const signupText = item.label || i18next.t("login:sign up now");
-      const signupClass = "font-medium text-foreground underline-offset-4 hover:underline";
+      const signupText = item.label || i18next.t(reforge ? "reforge:Create a free account" : "login:sign up now");
+      const signupClass = cn(
+        "font-medium text-foreground underline-offset-4 hover:underline",
+        reforge && "reforge-auth-link",
+      );
+      // the branded shell's own link to the sign-up page: the sign-in URL is
+      // remembered exactly as before, and the transition navigates itself
+      const onSignupClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+        Setting.storeSigninUrl();
+        handleReforgeAuthTransitionClick(event, {navigate, application, from: "signin", enabled: !preview});
+      };
       return (
-        <p key={key} className="login-signup-link pt-1 text-center text-sm text-muted-foreground">
-          {item.label ? null : <span className="mr-1">{i18next.t("login:No account?")}</span>}
+        <p
+          key={key}
+          className={cn(
+            "pt-1 text-center text-sm text-muted-foreground",
+            // the app's .login-signup-link rule right-aligns the row, the reference does not
+            reforge ? "reforge-auth-signup-row" : "login-signup-link",
+          )}
+        >
+          {item.label ? null : (
+            <span className="mr-1">{i18next.t(reforge ? "reforge:Don't have an account?" : "login:No account?")}</span>
+          )}
           {signupUrl.startsWith("/") ? (
-            <Link to={signupUrl} onClick={Setting.storeSigninUrl} className={signupClass}>{signupText}</Link>
+            <Link to={signupUrl} onClick={reforge ? onSignupClick : Setting.storeSigninUrl} className={signupClass}>{signupText}</Link>
           ) : (
             <a href={signupUrl} onClick={Setting.storeSigninUrl} className={signupClass}>{signupText}</a>
           )}
@@ -1551,7 +1544,8 @@ export default function LoginPage({type = "login", application: applicationProp,
           <ProviderButtons
             application={application}
             method="signin"
-            rule={Setting.getProvidersRule(application, item)}
+            // the reference stack is full-width labelled buttons, the configured "small" rule is not
+            rule={reforge ? "big" : Setting.getProvidersRule(application, item)}
             onBeforeClick={checkAgreement}
           />
         </div>
@@ -1561,10 +1555,19 @@ export default function LoginPage({type = "login", application: applicationProp,
     }
   };
 
+  // the reference ends the card with the provider stack and then the sign-up row
+  const reforgeTail = (
+    <>
+      {signinItems.filter((item) => item.name === "Providers").map(renderSigninItem)}
+      {signinItems.filter((item) => item.name === "Signup link").map(renderSigninItem)}
+    </>
+  );
+
   return (
     <AuthLayout
       preview={preview === "theme" ? "theme" : !!preview}
       application={application}
+      authPage={reforge ? "signin" : undefined}
       hideLogo={!isVisible("Logo")}
       hideLanguages={!isVisible("Languages")}
     >
@@ -1612,7 +1615,10 @@ export default function LoginPage({type = "login", application: applicationProp,
 
         {showForm ? (
           <form className="space-y-4" onSubmit={submit}>
-            {signinItems.map(renderSigninItem)}
+            {signinItems.map((item) =>
+              reforge && (item.name === "Providers" || item.name === "Signup link") ? null : renderSigninItem(item),
+            )}
+            {reforge ? reforgeTail : null}
           </form>
         ) : (
           <div className="space-y-4">
@@ -1627,9 +1633,11 @@ export default function LoginPage({type = "login", application: applicationProp,
                 {application.displayName}
               </a>
             </p>
-            {signinItems
-              .filter((item: any) => item.name === "Providers" || item.name === "Signup link")
-              .map(renderSigninItem)}
+            {reforge
+              ? reforgeTail
+              : signinItems
+                .filter((item) => item.name === "Providers" || item.name === "Signup link")
+                .map(renderSigninItem)}
           </div>
         )}
 
