@@ -134,32 +134,45 @@ Bundles SQLite and demo data into a single container. Ideal for a first look, bu
 
 Guide: [Try with Docker](https://casdoor.ai/docs/basic/try-with-docker)
 
-### Docker Compose — Casdoor with MySQL
+### Docker Compose — prebuilt image from Huawei SWR
 
-[`docker-compose.yml`](docker-compose.yml) starts Casdoor next to a MySQL 8 container.
+[`build-swr.yml`](.github/workflows/build-swr.yml) builds the Go backend and React frontend on pushes to `master`, or manual dispatches on `master`. It publishes the `STANDARD` image for `linux/amd64` to `swr.cn-east-3.myhuaweicloud.com/digitprint/casdoor` with `latest` and a pinned `sha-<commit>-<run-id>-<attempt>` tag.
 
-> **Two things to know before running it:**
->
-> 1. Compose **builds the image from source** (Go backend plus React frontend). The first `docker compose up` takes several minutes, so it is not the quick-trial path — use the all-in-one image above for that.
-> 2. You have to point Casdoor at the bundled database first.
+Before publishing, ensure the SWR organization `digitprint` exists and configure these GitHub repository secrets with credentials allowed to push to it:
 
-Set the MySQL settings in [`conf/app.conf`](conf/app.conf) to match the `db` service:
+- `SWR_USERNAME`
+- `SWR_PASSWORD`
 
-```ini
-driverName = mysql
-dataSourceName = root:123456@tcp(localhost:3306)/
-dbName = casdoor
+The checkout retains Git history for Casdoor's version stamping, but not Git authentication headers. Images use [`conf/app.docker.conf`](conf/app.docker.conf), not the local development configuration in `conf/app.conf`.
+
+[`docker-compose.yml`](docker-compose.yml) only pulls and runs that image. It does **not** build source, start a database, or create the database. Create an external database first, and grant its user permission to create and update Casdoor's tables. Use the database's reachable hostname, not `localhost` inside the Casdoor container.
+
+Create a local `.env` next to the compose file; replace the example values:
+
+```dotenv
+driverName=postgres
+dataSourceName='host=postgres.example.internal port=5432 user=casdoor password=<database-password> dbname=casdoor sslmode=require'
+dbName=casdoor
+origin=https://auth.example.com
+initAdminPassword='<strong-initial-admin-password>'
 ```
 
-Use `localhost` here even though MySQL runs in a separate container: the compose file sets `RUNNING_IN_DOCKER=true`, and Casdoor rewrites `localhost` to the Docker host address at startup (see [`conf/conf.go`](conf/conf.go)). Then start everything:
+Use the TLS settings required by your database; `sslmode=disable` is only appropriate for a trusted private database network without TLS. Keep secret values single-quoted in `.env` to prevent `$` interpolation, and never commit the file. `initAdminPassword` only sets the password when `built-in/admin` is first created; it does not reset an existing account.
+
+For a private SWR repository, log in on the deployment host before pulling:
 
 ```bash
-docker compose up
+docker login swr.cn-east-3.myhuaweicloud.com
+docker compose pull
+docker compose up -d
+curl --fail http://localhost:8000/api/health
 ```
 
-The compose entrypoint already passes `--createDatabase=true`, so the `casdoor` database is created for you.
+Compose exposes port `8000`; put it behind an HTTPS reverse proxy and restrict direct public access. In Coolify, use the compose file, configure its runtime variables and SWR registry credentials, and route your domain to container port `8000`.
 
-Guide: [Try with Docker](https://casdoor.ai/docs/basic/try-with-docker)
+The named volumes `casdoor_files` and `casdoor_sessions` persist uploads and file sessions across container replacement. Back up uploads together with the external database; do not use `docker compose down -v` unless you intend to delete the volumes. Application settings and users live in the database, so migrate the existing database to retain configured applications.
+
+To deploy a fixed version or roll back, replace the image's `latest` tag in the compose file with a published `sha-...` tag, then pull and recreate the service. Database migrations are not reversed by changing the image; check schema compatibility and keep a database backup before upgrades.
 
 ### Kubernetes — Helm
 
@@ -315,9 +328,9 @@ The complete list, including reverse proxies and third-party applications, is in
 Before exposing a Casdoor instance to the internet:
 
 - Change the built-in `admin` password. Never ship the demo credential `123`.
-- Serve Casdoor over HTTPS only, and set `origin` in [`conf/app.conf`](conf/app.conf) to your public URL.
-- Review [`conf/app.conf`](conf/app.conf) for values inherited from the sample file, especially `dataSourceName` and any provider secrets.
-- Set `runmode = prod` and keep `showSql = false` in production.
+- Serve Casdoor over HTTPS only, and set `origin` to your public URL (a runtime environment variable for Compose, or [`conf/app.conf`](conf/app.conf) when running from source).
+- Review deployment environment variables and configuration for sample database credentials and provider secrets.
+- Set `runmode = prod` and keep `showSql = false` in production; [`conf/app.docker.conf`](conf/app.docker.conf) already sets both for Docker images.
 
 ## 🤝 Community and support
 

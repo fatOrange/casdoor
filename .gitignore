@@ -43,3 +43,8 @@ web/cypress/videos/
 web/cypress/screenshots/
 web-old/cypress/videos/
 web-old/cypress/screenshots/
+
+# local docker-compose deployment secrets
+.env
+.env.*
+!.env.example

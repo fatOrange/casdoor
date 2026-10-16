@@ -1,32 +1,25 @@
+# Runs the prebuilt image `swr.cn-east-3.myhuaweicloud.com/digitprint/casdoor:latest` from SWR.
+# The database is external: this stack does not bundle one, so `dataSourceName` must point at an
+# existing PostgreSQL instance. Set `dataSourceName`, `origin`, and `initAdminPassword` first.
 services:
   casdoor:
+    image: swr.cn-east-3.myhuaweicloud.com/digitprint/casdoor:latest
+    pull_policy: always
     restart: always
-    build:
-      context: ./
-      dockerfile: Dockerfile
-      target: STANDARD
-    entrypoint: /bin/sh -c './server --createDatabase=true'
     ports:
-      - "8000:8000"
-    depends_on:
-      db:
-        condition: service_healthy
+      - 8000:8000
     environment:
-      RUNNING_IN_DOCKER: "true"
+      - driverName=${driverName:-postgres}
+      - dataSourceName=${dataSourceName:?}
+      - dbName=${dbName:-casdoor}
+      - origin=${origin:?}
+      - originFrontend=${origin}
+      - socks5Proxy=
+      - initAdminPassword=${initAdminPassword:?}
     volumes:
-      - ./conf:/conf/
-  db:
-    restart: always
-    image: mysql:8.0
-    ports:
-      - "3306:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: 123456
-    volumes:
-      - /usr/local/docker/mysql:/var/lib/mysql
-    healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
-      interval: 10s
-      timeout: 5s
-      start_period: 60s
-      retries: 5
+      - casdoor_files:/files
+      - casdoor_sessions:/tmp
+
+volumes:
+  casdoor_files:
+  casdoor_sessions:

@@ -1,1 +1,40 @@
-web/node_modules/
+# Local development config (contains the local database DSN and proxy). The images ship
+# conf/app.docker.conf as /conf/app.conf instead.
+conf/app.conf
+
+# Local environment files and secrets
+.env
+.env.*
+**/.env
+**/.env.*
+*.pem
+*.key
+
+# Dependencies, installed inside the FRONT stage
+**/node_modules
+
+# Frontend build output, rebuilt inside the FRONT stage
+web/build
+web/build-temp
+web/build-old
+web/cypress/videos
+web/cypress/screenshots
+
+# Deprecated antd frontend, not built anymore
+web-old
+
+# Data written by a local run
+/logs
+/files
+/tmp
+*.log
+*.db
+*.sqlite*
+lastupdate.tmp
+
+# Local binaries
+/server
+/server_linux_*
+
+# macOS
+.DS_Store
