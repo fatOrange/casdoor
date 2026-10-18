@@ -187,6 +187,7 @@ export function validateSignupItem(item: any, values: Record<string, any>, appli
   // these render no input of their own
   case "ID":
   case "Languages":
+  case "Logo":
   case "Providers":
   case "Signup button":
   case "Text 1":

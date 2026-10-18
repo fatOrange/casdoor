@@ -1,9 +1,11 @@
-// Default custom CSS attached to each signup item, ported from web/src/table/SignupTable.js.
+// Default custom CSS attached to each signup item, matching the antd
+// SignupTable in web-old apart from the web-only Logo item.
 
 const EmailCss = ".signup-email{}\n.signup-email-input{}\n.signup-email-code{}\n.signup-email-code-input{}\n";
 const PhoneCss = ".signup-phone{}\n.signup-phone-input{}\n.phone-code{}\n.signup-phone-code-input{}";
 
 export const SignupTableDefaultCssMap: Record<string, string> = {
+  "Logo": ".login-logo-box {}",
   "Username": ".signup-username {}\n.signup-username-input {}",
   "Display name": ".signup-first-name {}\n.signup-first-name-input{}\n.signup-last-name{}\n.signup-last-name-input{}\n.signup-name{}\n.signup-name-input{}",
   "Affiliation": ".signup-affiliation{}\n.signup-affiliation-input{}",

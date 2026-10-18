@@ -81,6 +81,7 @@ export function newApplication(account: Account) {
       {name: "Face ID", displayName: "Face ID", rule: "None"},
     ],
     signupItems: [
+      {name: "Logo", visible: true, required: false, prompted: false, rule: "None"},
       {name: "ID", visible: false, required: true, rule: "Random"},
       {name: "Username", visible: true, required: true, rule: "None"},
       {name: "Display name", visible: true, required: true, rule: "None"},

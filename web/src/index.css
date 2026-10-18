@@ -238,8 +238,10 @@ html.compact {
 
 @media (max-width: 639.98px) {
   /* here the panel is the viewport, so a padding meant for a wide desktop card —
-     an application's or our own — comes back to a phone-sized one */
-  .login-content .login-panel {
+     an application's or our own — comes back to a phone-sized one. The Reforge
+     template carries its own phone padding, so it opts out of this clamp; the
+     `:where` keeps the stock rule's specificity at two classes. */
+  .login-content:not(:where(.reforge-auth-content)) .login-panel {
     max-width: 100%;
     padding-left: 1.25rem;
     padding-right: 1.25rem;

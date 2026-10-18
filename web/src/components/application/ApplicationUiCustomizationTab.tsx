@@ -131,6 +131,7 @@ const SIGNIN_ITEM_NAMES: {name: string; labelKey: string}[] = [
 ];
 
 const SIGNUP_ITEM_NAMES: {name: string; labelKey: string}[] = [
+  {name: "Logo", labelKey: "general:Logo"},
   {name: "Username", labelKey: "signup:Username"},
   {name: "ID", labelKey: "general:ID"},
   {name: "Display name", labelKey: "general:Display name"},
@@ -164,8 +165,8 @@ const SIGNUP_ITEM_NAMES: {name: string; labelKey: string}[] = [
 /** the signin items whose text the antd table lets you relabel */
 const LABELED_SIGNIN_ITEMS = ["Username", "Password", "Verification code", "Signup link", "Forgot password?", "Login button"];
 /** signup items that are page furniture rather than fields, so they cannot be required or prompted */
-const NON_FIELD_SIGNUP_ITEMS = ["Signup button", "Providers", "Languages"];
-const NO_REGEX_SIGNUP_ITEMS = ["Password", "Confirm password", "Signup button", "Provider", "Providers", "Languages"];
+const NON_FIELD_SIGNUP_ITEMS = ["Logo", "Signup button", "Providers", "Languages"];
+const NO_REGEX_SIGNUP_ITEMS = ["Logo", "Password", "Confirm password", "Signup button", "Provider", "Providers", "Languages"];
 
 const AUTH_TEMPLATE_OPTIONS: {value: AuthTemplate; titleKey: string; descriptionKey: string}[] = [
   {
@@ -481,7 +482,7 @@ export function ApplicationUiCustomizationTab({application, updateField}: Applic
               render: (row: any, index, patch) => (
                 <SelectField
                   value={row.name}
-                  onChange={(v) => patch({name: v, customCss: SignupTableDefaultCssMap[v] ?? ""})}
+                  onChange={(v) => patch({name: v, customCss: SignupTableDefaultCssMap[v] ?? "", ...(v === "Logo" ? {required: false, prompted: false, rule: "None"} : {})})}
                   options={getUnusedItemOptions(SIGNUP_ITEM_NAMES, application.signupItems ?? [], index)}
                 />
               ),
@@ -492,7 +493,10 @@ export function ApplicationUiCustomizationTab({application, updateField}: Applic
               width: 90,
               render: (row: any, _i, patch) =>
                 row.name === "ID" ? null : (
-                  <Switch checked={!!row.visible} onCheckedChange={(v) => patch({visible: v, required: v})} />
+                  <Switch
+                    checked={!!row.visible}
+                    onCheckedChange={(v) => patch(row.name === "Logo" ? {visible: v, required: false} : {visible: v, required: v})}
+                  />
                 ),
             },
             {

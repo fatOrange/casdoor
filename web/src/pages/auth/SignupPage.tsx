@@ -240,11 +240,13 @@ export default function SignupPage({application: applicationProp, preview: previ
   const signinLink = reforge
     ? getReforgeSigninLink(application)
     : Setting.getStoredSigninUrl() || Setting.getLoginLink(application) || "/login";
+  // an application that lists no Logo item at all keeps the default logo
+  const hideLogo = Setting.getSignupItem(application, "Logo")?.visible === false;
 
   // without self signup, only an invitation link opens the signup form
   if (!application.enableSignUp || (application.disableSelfSignup && !values.invitationCode)) {
     return (
-      <AuthLayout preview={layoutPreview} application={application} authPage="signup">
+      <AuthLayout preview={layoutPreview} application={application} authPage="signup" hideLogo={hideLogo}>
         <div className="space-y-4">
           <Alert variant="warning">
             <AlertDescription>{i18next.t("application:The application does not allow to sign up new account")}</AlertDescription>
@@ -668,6 +670,7 @@ export default function SignupPage({application: applicationProp, preview: previ
       );
     case "ID":
     case "Languages":
+    case "Logo":
       return null;
     default: {
       const labelKey = SIMPLE_TEXT_ITEMS[item.name];
@@ -722,6 +725,7 @@ export default function SignupPage({application: applicationProp, preview: previ
       application={application}
       authPage="signup"
       wide
+      hideLogo={hideLogo}
       hideLanguages={(languagesItem && !languagesItem.visible) || forcedLanguage !== ""}
       onLanguageChange={(key) => {
         setUserLang(key);

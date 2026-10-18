@@ -128,6 +128,13 @@ an OAuth or device request is approved. Sign-up runs the same client-side rules
 the antd Form does — each signup item's own `regex` included — and reports them
 in Casdoor's own wording rather than the browser's.
 
+The sign-up logo has its own visibility switch in **UI Customization → Signup
+items → Logo → Visible**, independent of the sign-in logo. Existing applications
+can add a `Logo` row to `signupItems`; new applications include it by default.
+Only `visible: false` hides the logo, so omitting or deleting the row keeps it
+visible. The switch works with both Default and Reforge templates; a custom
+whole-page `signupHtml` remains responsible for its own logo.
+
 **Page templates** — an application's UI Customization tab offers two templates
 for its application-aware public authentication pages: `Default` and `Reforge`.
 The choice is stored in the application's `authTemplate` field (`default` or
@@ -142,12 +149,16 @@ The existing sign-in, sign-up and prompt previews remain the preview entry
 points, and each is a faithful, noninteractive rendering of the real public
 page: the editor mounts the application it currently holds in the page's own
 scaled desktop viewport, so the illustration, side panel and two-column layout
-appear as a visitor sees them, scaled to fit the tab. The header's Preview
+appear as a visitor sees them, scaled to fit the tab. The sign-up and sign-in
+pages are always previewed side by side, whatever sign-in methods the
+application enables; the prompt preview is separate. The header's Preview
 action opens that same sign-in preview in a dialog, using the configuration in
 the form — including unsaved template, theme and custom CSS changes — without
 saving it or navigating to the public login route. The previews are isolated
 from the console: they do not change its language or theme, and their clicks
 cannot submit a form or navigate.
+Application-supplied HTML is sanitized in a preview-only copy, so previewing
+trusted applications does not execute their custom scripts or alter stored HTML.
 
 `Reforge` is the card layout, branded by the application itself: the
 application's logo, name, theme, background, custom CSS, side panel and footer
