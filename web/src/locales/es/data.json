@@ -140,6 +140,16 @@
     "Other domains - Tooltip": "Dominios adicionales permitidos para esta aplicación",
     "Page HTML": "HTML de la página",
     "Page HTML - Tooltip": "HTML personalizado para la página principal de la aplicación, que permite el control completo sobre la estructura y el contenido de la página",
+    "Choose page template": "Elegir plantilla de página",
+    "Choose page template - description": "Al seleccionar una plantilla se actualiza la vista previa de inmediato. La elección se guarda con el resto de la aplicación.",
+    "Default template": "Plantilla predeterminada",
+    "Default template - description": "Las páginas de inicio de sesión y registro estándar de Casdoor.",
+    "Existing customization": "Personalización existente",
+    "Existing customization - description": "El tema, el CSS personalizado, el fondo, el panel lateral, el encabezado, la página y el pie de página siguen aplicándose a la plantilla seleccionada. Signin HTML y Signup HTML sustituyen toda la página y tienen prioridad sobre la plantilla.",
+    "Page template": "Plantilla de página",
+    "Page template - Tooltip": "Diseño que usan las páginas de inicio de sesión y registro de esta aplicación. La opción predeterminada mantiene los formularios estándar de Casdoor; Reforge usa el diseño de tarjeta de Reforge. La elección se guarda con la aplicación y se aplica a todas sus páginas de autenticación públicas.",
+    "Reforge template": "Plantilla Reforge",
+    "Reforge template - description": "El diseño de tarjeta de Reforge, con el logotipo, el tema y el fondo de la aplicación.",
     "Please enable \"Signin session\" first before enabling \"Auto signin\"": "Por favor, habilita \"Sesión de inicio de sesión\" primero antes de habilitar \"Inicio de sesión automático\"",
     "Please select a HTML file": "Por favor, seleccione un archivo HTML",
     "Pop up": "Ventana emergente",
@@ -1422,15 +1432,9 @@
   },
   "reforge": {
     "Already have an account?": "¿Tiene una cuenta?",
-    "By creating an account, you agree to the": "Al crear una cuenta, aceptas los",
     "Create a free account": "Crea una cuenta gratis",
     "Don't have an account?": "¿No tienes cuenta?",
-    "Privacy Policy": "Política de privacidad",
-    "Sign in": "Iniciar sesión",
-    "Sign in to OnePrep": "Iniciar sesión en OnePrep",
-    "Sign up": "Registrarse",
-    "Terms of Service": "Términos de servicio",
-    "and": "y"
+    "Sign in": "Iniciar sesión"
   },
   "resource": {
     "Copy Link": "Copiar enlace",

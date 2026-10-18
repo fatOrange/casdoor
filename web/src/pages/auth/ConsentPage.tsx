@@ -119,7 +119,7 @@ export default function ConsentPage() {
   };
 
   return (
-    <AuthLayout application={application}>
+    <AuthLayout application={application} authPage="consent" heading={null}>
       <div className="space-y-5">
         <div className="space-y-1 text-center">
           <h1 className="text-lg font-semibold">{i18next.t("consent:Authorization Request")}</h1>

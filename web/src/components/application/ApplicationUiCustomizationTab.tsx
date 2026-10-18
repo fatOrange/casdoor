@@ -1,7 +1,12 @@
 
+import * as React from "react";
 import i18next from "i18next";
+import {Check, LayoutTemplate} from "lucide-react";
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 import {Button} from "@/components/ui/button";
+import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
 import {Input} from "@/components/ui/input";
+import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import {Switch} from "@/components/ui/switch";
 import {CodeEditor} from "@/components/common/CodeEditor";
 import {SelectField} from "@/components/common/SelectField";
@@ -10,11 +15,12 @@ import {ThemeEditor} from "@/components/common/ThemeEditor";
 import {EditableTable} from "@/components/crud/EditableTable";
 import {ApplicationPromptPreview, ApplicationSignupSigninPreview} from "@/components/application/ApplicationPreview";
 import {FormRow} from "@/components/crud/FormRow";
-import type {ApplicationTabProps} from "@/components/application/types";
+import {getAuthTemplate, type ApplicationTabProps, type AuthTemplate} from "@/components/application/types";
 import {enumSelectOptions, type EnumMap} from "@/lib/enum-labels";
 import {SigninTableDefaultCssMap} from "@/lib/signin-css";
 import {SignupTableDefaultCssMap} from "@/lib/signup-css";
 import * as Setting from "@/lib/setting";
+import {cn} from "@/lib/utils";
 
 /**
  * A signin method's "Rule" also depends on the method, as in the antd
@@ -161,6 +167,19 @@ const LABELED_SIGNIN_ITEMS = ["Username", "Password", "Verification code", "Sign
 const NON_FIELD_SIGNUP_ITEMS = ["Signup button", "Providers", "Languages"];
 const NO_REGEX_SIGNUP_ITEMS = ["Password", "Confirm password", "Signup button", "Provider", "Providers", "Languages"];
 
+const AUTH_TEMPLATE_OPTIONS: {value: AuthTemplate; titleKey: string; descriptionKey: string}[] = [
+  {
+    value: "default",
+    titleKey: "application:Default template",
+    descriptionKey: "application:Default template - description",
+  },
+  {
+    value: "reforge",
+    titleKey: "application:Reforge template",
+    descriptionKey: "application:Reforge template - description",
+  },
+];
+
 /** a picked item cannot be picked again by another row */
 function getUnusedItemOptions(names: {name: string; labelKey: string}[], rows: any[], index: number) {
   return names
@@ -198,8 +217,75 @@ function getSigninItemRuleOptions(name: string) {
 
 /** The "UI Customization" tab: the blocks the sign-in and sign-up pages are built from. */
 export function ApplicationUiCustomizationTab({application, updateField}: ApplicationTabProps) {
+  const [templateDialogOpen, setTemplateDialogOpen] = React.useState(false);
+  const authTemplate: AuthTemplate = getAuthTemplate(application);
+  const hasWholePageHtml = Boolean(application.signinHtml || application.signupHtml);
+
   return (
     <>
+      <FormRow block labelKey="application:Page template">
+        <Dialog open={templateDialogOpen} onOpenChange={setTemplateDialogOpen}>
+          <DialogTrigger asChild>
+            <Button type="button" variant="outline" className="w-full justify-between sm:max-w-md">
+              <span className="flex items-center gap-2">
+                <LayoutTemplate />
+                {i18next.t(authTemplate === "reforge" ? "application:Reforge template" : "application:Default template")}
+              </span>
+              <span className="text-muted-foreground">{i18next.t("application:Choose page template")}</span>
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[640px]">
+            <DialogHeader>
+              <DialogTitle>{i18next.t("application:Choose page template")}</DialogTitle>
+              <DialogDescription>{i18next.t("application:Choose page template - description")}</DialogDescription>
+            </DialogHeader>
+            <Alert variant={hasWholePageHtml ? "warning" : "info"}>
+              <AlertTitle>{i18next.t("application:Existing customization")}</AlertTitle>
+              <AlertDescription>{i18next.t("application:Existing customization - description")}</AlertDescription>
+            </Alert>
+            <RadioGroup
+              value={authTemplate}
+              onValueChange={(value) => updateField("authTemplate", value)}
+              aria-label={i18next.t("application:Page template")}
+              className="grid gap-3 sm:grid-cols-2"
+            >
+              {AUTH_TEMPLATE_OPTIONS.map((option) => {
+                const selected = authTemplate === option.value;
+                return (
+                  <label
+                    key={option.value}
+                    htmlFor={`auth-template-${option.value}`}
+                    className={cn(
+                      "flex cursor-pointer flex-col gap-3 rounded-lg border bg-card p-4 shadow-sm transition-colors",
+                      selected && "border-primary bg-primary/5 ring-1 ring-primary",
+                    )}
+                  >
+                    <span className="flex items-start justify-between gap-3">
+                      <span className="block space-y-1">
+                        <span className="block font-medium">{i18next.t(option.titleKey)}</span>
+                        <span className="block text-sm text-muted-foreground">{i18next.t(option.descriptionKey)}</span>
+                      </span>
+                      <RadioGroupItem
+                        value={option.value}
+                        id={`auth-template-${option.value}`}
+                        aria-label={i18next.t(option.titleKey)}
+                        className="mt-0.5"
+                      />
+                    </span>
+                    <span className={cn("inline-flex items-center gap-1.5 text-xs font-medium text-primary", !selected && "invisible")}>
+                      <Check className="h-3.5 w-3.5" />
+                      {i18next.t("general:Selected")}
+                    </span>
+                  </label>
+                );
+              })}
+            </RadioGroup>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setTemplateDialogOpen(false)}>{i18next.t("general:Close")}</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </FormRow>
       <FormRow block labelKey="application:Org choice mode">
         <SelectField
           value={application.orgChoiceMode || "None"}

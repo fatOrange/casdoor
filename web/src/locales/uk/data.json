@@ -140,6 +140,16 @@
     "Other domains - Tooltip": "Додаткові дозволені домени для цього застосунку, що використовуються для крос-доменного контролю доступу",
     "Page HTML": "HTML сторінки",
     "Page HTML - Tooltip": "Спеціальний HTML для головної сторінки застосунку, що дозволяє повний контроль над структурою та вмістом сторінки",
+    "Choose page template": "Вибрати шаблон сторінки",
+    "Choose page template - description": "Вибір шаблону одразу оновлює попередній перегляд. Він зберігається разом з рештою налаштувань застосунку.",
+    "Default template": "Шаблон за замовчуванням",
+    "Default template - description": "Стандартні сторінки входу та реєстрації Casdoor.",
+    "Existing customization": "Наявне налаштування",
+    "Existing customization - description": "Тема, власний CSS, фон, бічна панель, верхній і нижній колонтитули та сторінка й надалі застосовуються до вибраного шаблону. Signin HTML і Signup HTML замінюють усю сторінку та мають вищий пріоритет за шаблон.",
+    "Page template": "Шаблон сторінки",
+    "Page template - Tooltip": "Макет сторінок входу та реєстрації цього застосунку. За замовчуванням використовуються стандартні форми Casdoor; Reforge використовує макет картки Reforge. Вибір зберігається разом із застосунком і застосовується до всіх його публічних сторінок автентифікації.",
+    "Reforge template": "Шаблон Reforge",
+    "Reforge template - description": "Макет картки Reforge з логотипом, темою та фоном застосунку.",
     "Please enable \"Signin session\" first before enabling \"Auto signin\"": "Спочатку увімкніть \"Сесію входу\", перш ніж увімкнути \"Автоматичний вхід\"",
     "Please select a HTML file": "Виберіть файл HTML",
     "Pop up": "Спливаюче вікно",
@@ -1422,15 +1432,9 @@
   },
   "reforge": {
     "Already have an account?": "Є акаунт?",
-    "By creating an account, you agree to the": "Створюючи акаунт, ви погоджуєтеся з",
     "Create a free account": "Створити безкоштовний акаунт",
     "Don't have an account?": "Немає облікового запису?",
-    "Privacy Policy": "Політика конфіденційності",
-    "Sign in": "Увійти",
-    "Sign in to OnePrep": "Увійти в OnePrep",
-    "Sign up": "Зареєструватися",
-    "Terms of Service": "Умови використання",
-    "and": "та"
+    "Sign in": "Увійти"
   },
   "resource": {
     "Copy Link": "Копіювати посилання",

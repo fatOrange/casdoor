@@ -17,12 +17,20 @@ import * as ApplicationBackend from "@/backend/ApplicationBackend";
 import * as UserBackend from "@/backend/UserBackend";
 import * as Setting from "@/lib/setting";
 
+interface PromptPageProps {
+  application?: unknown;
+  /** `theme` renders in the preview page's own frame, where the application theme applies */
+  preview?: boolean | "theme";
+}
+
 /**
  * Collects what an application marks as "prompted" after sign-in — the third-party
  * accounts it wants bound plus the profile fields it still needs — then continues
  * the OAuth redirect it was interrupted from.
  */
-export default function PromptPage({application: applicationProp}: {application?: any} = {}) {
+export default function PromptPage({application: applicationProp, preview: previewProp}: PromptPageProps = {}) {
+  const preview = previewProp ?? !!applicationProp;
+  const layoutPreview = preview === "theme" ? "theme" : preview;
   const params = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -91,7 +99,7 @@ export default function PromptPage({application: applicationProp}: {application?
   // Nothing is prompted, so the visitor should never have landed here.
   if (application && !Setting.hasPromptPage(application)) {
     return (
-      <AuthLayout preview={!!applicationProp} application={application}>
+      <AuthLayout preview={layoutPreview} application={application} authPage="prompt">
         <div className="space-y-4">
           <Alert variant="warning">
             <AlertDescription>{i18next.t("application:You are unexpected to see this prompt page")}</AlertDescription>
@@ -127,7 +135,7 @@ export default function PromptPage({application: applicationProp}: {application?
   const hasPromptedProviders = (application?.providers ?? []).some((item: any) => Setting.isProviderPrompted(item));
 
   return (
-    <AuthLayout preview={!!applicationProp} application={application}>
+    <AuthLayout preview={layoutPreview} application={application} authPage="prompt" heading={null}>
       <div className="space-y-5">
         <h1 className="text-center text-lg font-semibold">{i18next.t("application:Binding providers")}</h1>
 

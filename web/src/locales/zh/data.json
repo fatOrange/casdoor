@@ -140,6 +140,16 @@
     "Other domains - Tooltip": "该应用允许的其他域名，用于跨域访问控制",
     "Page HTML": "页面HTML",
     "Page HTML - Tooltip": "应用主页面的自定义HTML，可完全控制页面结构和内容",
+    "Choose page template": "选择页面模板",
+    "Choose page template - description": "选择模板后会立即更新预览；保存应用时一并保存。",
+    "Default template": "默认模板",
+    "Default template - description": "Casdoor 标准的登录页和注册页。",
+    "Existing customization": "已有自定义设置",
+    "Existing customization - description": "主题、自定义 CSS、背景、侧面板、页头、页面和页脚设置仍会生效。登录 HTML 和注册 HTML 会替换整个页面，优先级高于模板。",
+    "Page template": "页面模板",
+    "Page template - Tooltip": "该应用登录页和注册页使用的布局。默认使用 Casdoor 标准表单；Reforge 使用 Reforge 卡片布局。选择会随应用保存，并应用于该应用的所有公开认证页面。",
+    "Reforge template": "Reforge 模板",
+    "Reforge template - description": "Reforge 卡片布局，使用应用的 Logo、主题和背景。",
     "Please enable \"Signin session\" first before enabling \"Auto signin\"": "开启 \"保持登录会话\" 后才能开启 \"自动登录\"",
     "Please select a HTML file": "请选择一个HTML文件",
     "Pop up": "弹框",
@@ -1422,15 +1432,9 @@
   },
   "reforge": {
     "Already have an account?": "已有账号？",
-    "By creating an account, you agree to the": "创建账号即表示您同意",
     "Create a free account": "免费创建账号",
     "Don't have an account?": "没有账号？",
-    "Privacy Policy": "隐私政策",
-    "Sign in": "登录",
-    "Sign in to OnePrep": "登录 OnePrep",
-    "Sign up": "注册",
-    "Terms of Service": "服务条款",
-    "and": "和"
+    "Sign in": "登录"
   },
   "resource": {
     "Copy Link": "复制链接",

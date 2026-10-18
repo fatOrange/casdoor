@@ -102,7 +102,7 @@ export default function InitAdminPage() {
   };
 
   return (
-    <AuthLayout application={application}>
+    <AuthLayout application={application} authPage="init-admin" heading={null}>
       <form
         className="space-y-4"
         onSubmit={(e) => {

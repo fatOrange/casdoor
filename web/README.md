@@ -128,41 +128,64 @@ an OAuth or device request is approved. Sign-up runs the same client-side rules
 the antd Form does — each signup item's own `regex` included — and reports them
 in Casdoor's own wording rather than the browser's.
 
-**智考鸭 presentation** — Only `organization_dm01/dm01-reforge-login` uses the
-custom sign-in/sign-up shell, with the fixed sign-in heading `登录智考鸭`.
-It keeps the application's existing fields, validation, WeChat/phone sign-in
-and authentication requests; it does not
-provision providers or change application configuration. Its provider row shows
-only the application's own configured providers; the reference Google, Microsoft
-and Apple placeholder buttons are not rendered.
+**Page templates** — an application's UI Customization tab offers two templates
+for its application-aware public authentication pages: `Default` and `Reforge`.
+The choice is stored in the application's `authTemplate` field (`default` or
+`reforge`); a missing or unknown value renders the default template. Every
+application saved before the field existed therefore keeps the stock pages, with
+no automatic migration. Selecting a template in the edit page changes only the
+embedded preview until the application is saved through the normal Save action.
+The UI JSON import/export on the same page carries the field.
+The former name-based Reforge application exception no longer applies; that
+application also uses Default until Reforge is explicitly selected and saved.
+The existing sign-in, sign-up and prompt previews remain the preview entry
+points, and each is a faithful, noninteractive rendering of the real public
+page: the editor mounts the application it currently holds in the page's own
+scaled desktop viewport, so the illustration, side panel and two-column layout
+appear as a visitor sees them, scaled to fit the tab. The header's Preview
+action opens that same sign-in preview in a dialog, using the configuration in
+the form — including unsaved template, theme and custom CSS changes — without
+saving it or navigating to the public login route. The previews are isolated
+from the console: they do not change its language or theme, and their clicks
+cannot submit a form or navigate.
 
-Use the existing `/login/oauth/authorize` entry with this application's `client_id`
+`Reforge` is the card layout, branded by the application itself: the
+application's logo, name, theme, background, custom CSS, side panel and footer
+apply to it. It keeps the application's existing fields, validation,
+WeChat/phone sign-in and authentication requests; it does not provision providers
+or change application configuration. Its provider row shows only the
+application's own configured providers; the reference Google, Microsoft and
+Apple placeholder buttons are not rendered. The shell's headings, legal copy and
+branding come from the application and the page. The admin console and the
+standalone `/mfa/setup` wizard keep their own layout.
+Pages that cannot resolve an application, including application-loading errors,
+the Telegram login helper and the CAS logout transition, use the default layout.
+
+`signinHtml` and `signupHtml` are whole-page overrides: when set, they replace the
+page and take precedence over the selected template. The other customization
+fields do not disable it — `themeData`, custom CSS, background URLs, the side
+panel, header/page/footer HTML and the footer continue to apply on top of the
+template.
+
+Use the existing `/login/oauth/authorize` entry with the application's `client_id`
 and complete OAuth query. Copy the sign-in URL from the application's Basic tab
 to use a registered redirect URI. Its `/signup/oauth/authorize` counterpart keeps
 the same query when switching between sign-in and sign-up.
 
-The original `/signup/dm01-reforge-login` route remains available, but without a
-stored OAuth sign-in URL or current OAuth query its return link follows the
-original `getLoginLink()` fallback; it cannot reconstruct a client callback.
-`/login/organization_dm01` still opens the organization's configured default
-application, not necessarily this one.
-
-Switching between this application's sign-in and sign-up pages morphs the card
-over 240 ms and fades the form and illustration. Browsers without the View
-Transition API, or visitors who prefer reduced motion, switch without animation.
+Switching between the Reforge sign-in and sign-up pages morphs the card over
+240 ms and fades the form and illustration. Browsers without the View Transition
+API, or visitors who prefer reduced motion, switch without animation.
 
 The WeChat tab reserves a 230 × 230 loading slot and renders a QR code only after
 the real code arrives. The method fields have a minimum height that keeps the
 card steady when switching between WeChat and verification-code sign-in; longer
 fields and validation messages can still expand it.
 
-The shell uses local assets from `public/oneprep`, a fixed light palette and an
-English default with an application-scoped language choice. Its header logo is a
-neutral placeholder — a dashed, rounded 120 × 40 box reading "LOGO", which is
-also its accessible name — rather than a brand mark. Embedded previews leave the
-console language alone; leaving the standalone flow restores the visitor's
-previous language. Actual verification delivery still requires the appropriate
-Email/SMS providers.
+The shell serves its illustration from a local asset and defaults to English,
+with an application-scoped language choice. Embedded previews leave the console
+language alone; leaving the standalone flow restores the visitor's previous
+language. Actual verification delivery still requires the appropriate Email/SMS
+providers.
 
 The sign-in illustration is a local 1600 × 1097 WebP of Katsushika Hokusai's
 *The Great Wave off Kanagawa*, from the

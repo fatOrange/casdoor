@@ -3,7 +3,7 @@ import type {NavigateFunction} from "react-router-dom";
 
 const TRANSITION_MARKER = "data-reforge-auth-transition";
 
-/** the branded shell's own root, the ground truth for "the destination is ready": it
+/** the template shell's own root, the ground truth for "the destination is ready": it
  *  renders only once the page's own data and initial language are on screen */
 const SHELL_SELECTOR = ".reforge-auth";
 

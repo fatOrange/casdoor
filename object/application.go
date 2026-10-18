@@ -175,6 +175,7 @@ type Application struct {
 	SignupHtml              string                 `xorm:"mediumtext" json:"signupHtml"`
 	SigninHtml              string                 `xorm:"mediumtext" json:"signinHtml"`
 	ThemeData               *ThemeData             `xorm:"json" json:"themeData"`
+	AuthTemplate            string                 `xorm:"varchar(20)" json:"authTemplate"`
 	FooterHtml              string                 `xorm:"mediumtext" json:"footerHtml"`
 	FormCss                 string                 `xorm:"text" json:"formCss"`
 	FormCssMobile           string                 `xorm:"text" json:"formCssMobile"`

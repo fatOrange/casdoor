@@ -140,6 +140,16 @@
     "Other domains - Tooltip": "Các miền được phép bổ sung cho ứng dụng này, được sử dụng để kiểm soát truy cập liên miền",
     "Page HTML": "HTML trang",
     "Page HTML - Tooltip": "HTML tùy chỉnh cho trang chính của ứng dụng, cho phép kiểm soát hoàn toàn cấu trúc và nội dung trang",
+    "Choose page template": "Chọn mẫu trang",
+    "Choose page template - description": "Khi chọn mẫu, bản xem trước cập nhật ngay. Lựa chọn được lưu cùng phần còn lại của ứng dụng.",
+    "Default template": "Mẫu mặc định",
+    "Default template - description": "Trang đăng nhập và đăng ký tiêu chuẩn của Casdoor.",
+    "Existing customization": "Tùy chỉnh hiện có",
+    "Existing customization - description": "Chủ đề, CSS tùy chỉnh, nền, bảng bên, đầu trang, trang và chân trang vẫn áp dụng cho mẫu đã chọn. Signin HTML và Signup HTML thay thế toàn bộ trang và được ưu tiên hơn mẫu.",
+    "Page template": "Mẫu trang",
+    "Page template - Tooltip": "Bố cục dùng cho trang đăng nhập và đăng ký của ứng dụng này. Mặc định giữ biểu mẫu Casdoor tiêu chuẩn; Reforge dùng bố cục thẻ Reforge. Lựa chọn được lưu cùng ứng dụng và áp dụng cho mọi trang xác thực công khai.",
+    "Reforge template": "Mẫu Reforge",
+    "Reforge template - description": "Bố cục thẻ Reforge với logo, chủ đề và nền của ứng dụng.",
     "Please enable \"Signin session\" first before enabling \"Auto signin\"": "Vui lòng kích hoạt \"Phiên đăng nhập\" trước khi kích hoạt \"Đăng nhập tự động\"",
     "Please select a HTML file": "Vui lòng chọn tệp HTML",
     "Pop up": "Bật lên",
@@ -1422,15 +1432,9 @@
   },
   "reforge": {
     "Already have an account?": "Có tài khoản không?",
-    "By creating an account, you agree to the": "Bằng cách tạo tài khoản, bạn đồng ý với",
     "Create a free account": "Tạo tài khoản miễn phí",
     "Don't have an account?": "Không có tài khoản?",
-    "Privacy Policy": "Chính sách bảo mật",
-    "Sign in": "Đăng nhập",
-    "Sign in to OnePrep": "Đăng nhập vào OnePrep",
-    "Sign up": "Đăng ký",
-    "Terms of Service": "Điều khoản dịch vụ",
-    "and": "và"
+    "Sign in": "Đăng nhập"
   },
   "resource": {
     "Copy Link": "Sao chép liên kết",

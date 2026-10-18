@@ -38,7 +38,7 @@ export default function ResultPage() {
       : (account ? "/" : "/login"));
 
   return (
-    <AuthLayout application={application}>
+    <AuthLayout application={application} authPage="result" heading={null}>
       <div className="space-y-4 text-center">
         <CheckCircle2 className="mx-auto h-12 w-12 text-success" />
         <h1 className="text-xl font-semibold">{i18next.t("signup:Your account has been created!")}</h1>

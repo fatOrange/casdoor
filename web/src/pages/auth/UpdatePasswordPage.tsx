@@ -125,7 +125,7 @@ export default function UpdatePasswordPage() {
   };
 
   return (
-    <AuthLayout application={application}>
+    <AuthLayout application={application} authPage="update-password" heading={null}>
       <form
         className="space-y-4"
         onSubmit={(e) => {

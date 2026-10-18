@@ -3,9 +3,11 @@ import i18next from "i18next";
 import {useNavigate, useParams} from "react-router-dom";
 import {UnauthorizedPage} from "@/components/common/UnauthorizedPage";
 import {Button} from "@/components/ui/button";
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {Loading} from "@/components/common/Loading";
 import {ApplicationExportButton, ApplicationImportModal} from "@/components/application/ApplicationImportExport";
+import {ApplicationAuthPreviewFrame} from "@/components/application/ApplicationAuthPreviewFrame";
 import {ApplicationAuthenticationTab} from "@/components/application/ApplicationAuthenticationTab";
 import {ApplicationBasicTab} from "@/components/application/ApplicationBasicTab";
 import {ApplicationOidcOauthTab} from "@/components/application/ApplicationOidcOauthTab";
@@ -42,6 +44,7 @@ export default function ApplicationEditPage() {
   const navigate = useNavigate();
   const {account} = useAccount();
   const [saving, setSaving] = React.useState(false);
+  const [previewOpen, setPreviewOpen] = React.useState(false);
 
   const organizations = useOrganizationOptions();
   const certs = useCertOptions(organizationName);
@@ -153,9 +156,23 @@ export default function ApplicationEditPage() {
       saving={saving}
       extraActions={
         <>
-          <Button variant="outline" onClick={() => Setting.goToLink(Setting.getLoginLink(application))}>
+          <Button variant="outline" onClick={() => setPreviewOpen(true)}>
             {i18next.t("general:Preview")}
           </Button>
+          {/* previews the record in the form, not the saved one; opening or closing it never saves */}
+          <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+            <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-[90vw] lg:max-w-[1280px]">
+              <DialogHeader>
+                <DialogTitle>{i18next.t("general:Preview")}</DialogTitle>
+              </DialogHeader>
+              <ApplicationAuthPreviewFrame application={application} page="signin" />
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setPreviewOpen(false)}>
+                  {i18next.t("general:Close")}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
           {mode !== "add" ? (
             <>
               <ApplicationExportButton application={application} />

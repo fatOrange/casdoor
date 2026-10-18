@@ -220,6 +220,7 @@ export default function ForgetPage() {
   return (
     <AuthLayout
       application={application}
+      authPage="forget"
       onBack={back}
       footer={
         signinLink.startsWith("/") ? (

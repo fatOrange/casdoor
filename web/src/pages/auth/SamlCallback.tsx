@@ -154,7 +154,7 @@ export default function SamlCallback() {
 
   if (mfa !== null) {
     return (
-      <AuthLayout application={application}>
+      <AuthLayout application={application} authPage="saml" heading={null}>
         <MfaVerify
           formValues={mfa.values}
           authParams={mfa.authParams}

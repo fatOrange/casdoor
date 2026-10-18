@@ -140,6 +140,16 @@
     "Other domains - Tooltip": "このアプリケーションで許可される追加ドメイン",
     "Page HTML": "ページHTML",
     "Page HTML - Tooltip": "アプリケーションのメインページのカスタムHTMLで、ページの構造とコンテンツを完全に制御できます",
+    "Choose page template": "ページテンプレートを選択",
+    "Choose page template - description": "テンプレートを選択するとプレビューがすぐに更新されます。選択内容はアプリケーションの保存時に一緒に保存されます。",
+    "Default template": "デフォルトテンプレート",
+    "Default template - description": "標準の Casdoor サインイン・サインアップページ。",
+    "Existing customization": "既存のカスタマイズ",
+    "Existing customization - description": "テーマ、カスタム CSS、背景、サイドパネル、ヘッダー、ページ、フッターの設定は引き続き選択したテンプレートに適用されます。Signin HTML と Signup HTML はページ全体を置き換え、テンプレートより優先されます。",
+    "Page template": "ページテンプレート",
+    "Page template - Tooltip": "このアプリケーションのサインインとサインアップページで使用するレイアウトです。デフォルトは標準の Casdoor フォームを維持し、Reforge は Reforge カードレイアウトを使用します。選択内容はアプリケーションとともに保存され、すべての公開認証ページに適用されます。",
+    "Reforge template": "Reforge テンプレート",
+    "Reforge template - description": "アプリケーションのロゴ、テーマ、背景を使用した Reforge カードレイアウト。",
     "Please enable \"Signin session\" first before enabling \"Auto signin\"": "\"自動サインイン\"を有効にする前に、まず\"サインインセッション\"を有効にしてください",
     "Please select a HTML file": "HTMLファイルを選択してください",
     "Pop up": "ポップアップ",
@@ -1422,15 +1432,9 @@
   },
   "reforge": {
     "Already have an account?": "アカウントはありますか？",
-    "By creating an account, you agree to the": "アカウントを作成すると、以下に同意したものとみなされます：",
     "Create a free account": "無料アカウントを作成",
     "Don't have an account?": "アカウントがありませんか？",
-    "Privacy Policy": "プライバシーポリシー",
-    "Sign in": "サインイン",
-    "Sign in to OnePrep": "OnePrep にサインイン",
-    "Sign up": "サインアップ",
-    "Terms of Service": "利用規約",
-    "and": "と"
+    "Sign in": "サインイン"
   },
   "resource": {
     "Copy Link": "コピー リンク",

@@ -140,6 +140,16 @@
     "Other domains - Tooltip": "Domínios adicionais permitidos para esta aplicação, usados para controle de acesso entre domínios",
     "Page HTML": "HTML da página",
     "Page HTML - Tooltip": "HTML personalizado para a página principal da aplicação, permitindo controle total sobre a estrutura e o conteúdo da página",
+    "Choose page template": "Escolher modelo de página",
+    "Choose page template - description": "A seleção de um modelo atualiza a prévia imediatamente. A escolha é salva com o restante do aplicativo.",
+    "Default template": "Modelo padrão",
+    "Default template - description": "As páginas de login e cadastro padrão do Casdoor.",
+    "Existing customization": "Personalização existente",
+    "Existing customization - description": "Tema, CSS personalizado, plano de fundo, painel lateral, cabeçalho, página e rodapé continuam a ser aplicados ao modelo selecionado. Signin HTML e Signup HTML substituem a página inteira e têm precedência sobre o modelo.",
+    "Page template": "Modelo de página",
+    "Page template - Tooltip": "Layout usado pelas páginas de login e cadastro deste aplicativo. O padrão mantém os formulários padrão do Casdoor; o Reforge usa o layout de cartão Reforge. A escolha é salva com o aplicativo e se aplica a todas as suas páginas públicas de autenticação.",
+    "Reforge template": "Modelo Reforge",
+    "Reforge template - description": "O layout de cartão Reforge, com o logotipo, o tema e o plano de fundo do aplicativo.",
     "Please enable \"Signin session\" first before enabling \"Auto signin\"": "Por favor, habilite a \"Sessão de login\" primeiro antes de habilitar o \"Login automático\"",
     "Please select a HTML file": "Por favor, selecione um arquivo HTML",
     "Pop up": "Abrir em pop-up",
@@ -1422,15 +1432,9 @@
   },
   "reforge": {
     "Already have an account?": "Já possui uma conta?",
-    "By creating an account, you agree to the": "Ao criar uma conta, você concorda com os",
     "Create a free account": "Criar uma conta gratuita",
     "Don't have an account?": "Não possui uma conta?",
-    "Privacy Policy": "Política de Privacidade",
-    "Sign in": "Entrar",
-    "Sign in to OnePrep": "Entrar no OnePrep",
-    "Sign up": "Cadastrar-se",
-    "Terms of Service": "Termos de Serviço",
-    "and": "e"
+    "Sign in": "Entrar"
   },
   "resource": {
     "Copy Link": "Copiar Link",

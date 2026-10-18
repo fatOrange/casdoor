@@ -1,14 +1,18 @@
 import * as React from "react";
 import i18next from "i18next";
 import {ArrowLeft} from "lucide-react";
+import {CustomHtml, CustomStyle} from "@/components/common/CustomHtml";
+import {ThemeToggle} from "@/components/common/ThemeToggle";
+import {PoweredBy} from "@/components/layout/PoweredBy";
 import {useLanguage} from "@/hooks/use-language";
+import {useIsMobile} from "@/hooks/use-mobile";
+import type {AuthPage} from "@/lib/reforge-auth";
+import {getSafeHtml} from "@/lib/custom-html";
 import * as Setting from "@/lib/setting";
 import {cn} from "@/lib/utils";
 import "./reforge-auth.css";
 
 const ILLUSTRATION_URL = "/oneprep/great-wave.webp";
-const TERMS_OF_SERVICE_URL = "https://www.oneprep.xyz/terms-of-service";
-const PRIVACY_POLICY_URL = "https://www.oneprep.xyz/privacy-policy";
 
 /** this flow's own language, so no other application's pick leaks in */
 const SIGNIN_LANGUAGE_KEY = "reforgeSigninLanguage";
@@ -16,15 +20,14 @@ const SIGNIN_LANGUAGE_KEY = "reforgeSigninLanguage";
 /** the reference pages are English */
 const DEFAULT_LANGUAGE = "en";
 
-// The sign-in and the sign-up page share one flow lifecycle: the language and the
-// shared `signinLanguage` value the visitor arrived with go back when the last
-// shell unmounts. A same-tick swap between the two pages is not a leave — the
-// restore waits for a microtask, by which time the next shell has mounted.
+// The pages of a template share one flow lifecycle: the language and the shared
+// `signinLanguage` value the visitor arrived with go back when the last shell
+// unmounts. A same-tick swap between two pages is not a leave — the restore waits
+// for a microtask, by which time the next shell has mounted.
 let shells = 0;
 let flowLanguage = "";
 let flowSigninLanguage = "";
 let restoreScheduled = false;
-let bodyHadThemeScope = false;
 let bodyHadMarker = false;
 
 function enterFlow() {
@@ -32,12 +35,9 @@ function enterFlow() {
   if (shells === 0 && !restoreScheduled) {
     flowLanguage = i18next.language;
     flowSigninLanguage = Setting.getSigninLanguage();
-    // portaled menus and dialogs hang off <body>, outside the shell's own scope,
-    // so the light palette (pinned by reforge-auth.css) is lent to the body for
-    // the length of the flow
-    bodyHadThemeScope = document.body.classList.contains("theme-scope-light");
+    // the marker scopes the sign-in ↔ sign-up view transition
     bodyHadMarker = document.body.classList.contains("reforge-auth-active");
-    document.body.classList.add("theme-scope-light", "reforge-auth-active");
+    document.body.classList.add("reforge-auth-active");
   }
   shells += 1;
 }
@@ -57,9 +57,6 @@ function leaveFlow() {
       void i18next.changeLanguage(flowLanguage);
     }
     Setting.setSigninLanguage(flowSigninLanguage);
-    if (!bodyHadThemeScope) {
-      document.body.classList.remove("theme-scope-light");
-    }
     if (!bodyHadMarker) {
       document.body.classList.remove("reforge-auth-active");
     }
@@ -68,20 +65,44 @@ function leaveFlow() {
 
 interface ReforgeAuthApplication {
   organizationObj?: {languages?: string[]};
+  displayName?: string;
+  name?: string;
+  homepageUrl?: string;
 }
 
 interface ReforgeAuthLayoutProps {
   application?: ReforgeAuthApplication;
-  authPage: "signin" | "signup";
+  authPage: AuthPage;
+  /** the page's own h1; `null` keeps the page content's heading instead */
+  heading?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
   /** the row shown at the bottom of the card */
   footer?: React.ReactNode;
+  hideLogo?: boolean;
+  hideLanguages?: boolean;
   onLanguageChange?: (key: string) => void;
   onBack?: () => void;
   /** the console's own preview of this page: the shell then leaves the console's
-   *  language and its sessionStorage keys alone */
+   *  language, sessionStorage keys and transition marker alone */
   preview?: boolean;
+  /** the editor's fixed-height frame: the shell fills it and starts at the top
+   *  instead of centring itself in the browser viewport */
+  bounded?: boolean;
+  /** the application chrome, resolved once by AuthLayout */
+  logo: string;
+  formCss?: string;
+  backgroundUrl?: string;
+  /** formOffset: 1 left, 2 center, 3 right, 4 center with the side panel */
+  offset?: number;
+  /** the configured side panel, shown where the stock layout shows it too */
+  sidePanel?: string;
+  footerHtml?: string;
+  trusted?: boolean;
+  /** an embedded page keeps its host's background and stylesheet */
+  embedded?: boolean;
+  /** the application's own form CSS paints a light panel inside a dark page */
+  panelIsLight?: boolean;
 }
 
 /** The application's languages, in the order the console lists them. */
@@ -100,26 +121,63 @@ function getInitialLanguage(options: {key: string}[]): string {
   return keys.includes(DEFAULT_LANGUAGE) ? DEFAULT_LANGUAGE : (keys[0] ?? DEFAULT_LANGUAGE);
 }
 
+/** The heading of a page whose content does not carry one of its own. */
+function getDefaultHeading(authPage: AuthPage) {
+  switch (authPage) {
+  case "signup":
+    return i18next.t("account:Sign Up");
+  case "forget":
+    return i18next.t("forget:Change Password");
+  case "prompt":
+    return i18next.t("application:Binding providers");
+  case "consent":
+    return i18next.t("consent:Authorization Request");
+  case "result":
+    return i18next.t("signup:Your account has been created!");
+  case "update-password":
+    return i18next.t("user:You need to update your password");
+  case "init-admin":
+    return i18next.t("login:Welcome to Casdoor");
+  default:
+    return i18next.t("login:Sign In");
+  }
+}
+
 /**
- * The Zhikaoya-branded shell around the reforge pages' own form markup. It owns
- * the flow language: the form mounts only once the initial language is on
- * screen, picks are parked under this app's own sessionStorage key, and the
- * visitor's language (with the shared `signinLanguage`) comes back on the way out.
+ * The Reforge shell around an application's own form markup. It follows the
+ * application's theme, branding, language and customization (offset, background,
+ * side panel, footer) while keeping the stock auth class names available to the
+ * application's own CSS.
  */
 export function ReforgeAuthLayout({
   application,
   authPage,
+  heading,
   children,
   className,
   footer,
+  hideLogo,
+  hideLanguages,
   onLanguageChange,
   onBack,
   preview,
+  bounded,
+  logo,
+  formCss,
+  backgroundUrl,
+  offset = 2,
+  sidePanel,
+  footerHtml,
+  trusted = false,
+  embedded = false,
+  panelIsLight = false,
 }: ReforgeAuthLayoutProps) {
   const language = useLanguage();
+  const isMobile = useIsMobile();
   const languages = getLanguageOptions(application);
-  const [initialLanguage] = React.useState(() => getInitialLanguage(languages));
-  const [started, setStarted] = React.useState(() => !!preview || language === initialLanguage);
+  const syncLanguage = !preview && !hideLanguages;
+  const [initialLanguage] = React.useState(() => syncLanguage ? getInitialLanguage(languages) : language);
+  const [started, setStarted] = React.useState(() => !syncLanguage || language === initialLanguage);
   // set once the visitor picks with the control, after which nothing is enforced
   const picked = React.useRef(false);
 
@@ -134,7 +192,7 @@ export function ReforgeAuthLayout({
   // The form mounts only once this flow's language is on screen; the switch is
   // re-asserted until it lands, as StrictMode's simulated remount resets it.
   React.useLayoutEffect(() => {
-    if (preview || language === initialLanguage) {
+    if (!syncLanguage || language === initialLanguage) {
       if (!started) {
         setStarted(true);
       }
@@ -143,7 +201,7 @@ export function ReforgeAuthLayout({
     if (!picked.current) {
       i18next.changeLanguage(initialLanguage).catch(() => setStarted(true));
     }
-  }, [preview, started, language, initialLanguage]);
+  }, [syncLanguage, started, language, initialLanguage]);
 
   if (!started) {
     return null;
@@ -161,74 +219,121 @@ export function ReforgeAuthLayout({
     onLanguageChange?.(key);
   };
 
-  const picker =
-    !preview && languages.length > 1 ? (
-      <div className="reforge-auth-topbar">
-        <select
-          className="reforge-auth-lang-select"
-          aria-label={i18next.t("user:Language")}
-          value={languages.some((option) => option.key === language) ? language : initialLanguage}
-          onChange={(event) => pickLanguage(event.target.value)}
-        >
-          {languages.map((option) => (
-            <option key={option.key} value={option.key}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </div>
+  const languagePicker =
+    !preview && !hideLanguages && languages.length > 1 ? (
+      <select
+        className="reforge-auth-lang-select"
+        aria-label={i18next.t("user:Language")}
+        value={languages.some((option) => option.key === language) ? language : initialLanguage}
+        onChange={(event) => pickLanguage(event.target.value)}
+      >
+        {languages.map((option) => (
+          <option key={option.key} value={option.key}>
+            {option.label}
+          </option>
+        ))}
+      </select>
     ) : null;
 
-  const and = i18next.t("reforge:and");
+  const headingNode = heading === undefined ? getDefaultHeading(authPage) : heading;
+  const logoImage = (
+    <img
+      src={logo}
+      alt={application?.displayName || application?.name || "Casdoor"}
+      className="reforge-auth-logo-image"
+    />
+  );
+  const showHeader = !hideLogo || headingNode !== null;
+  // the stock layout shows a side panel only at offset 4; everything else keeps
+  // the reference illustration on the sign-in page, where the reference has one
+  const secondary = sidePanel ? "side" : authPage === "signin" ? "illustration" : "none";
+  const effectiveOffset = offset === 4 && !sidePanel ? 2 : offset;
 
   return (
-    <div className="reforge-auth theme-scope-light" data-page={authPage}>
+    <div
+      className={cn(
+        "reforge-auth",
+        // index.css pins .login-background to 100dvh, which the editor's frame must not inherit
+        !bounded && "login-background",
+        bounded && "reforge-auth-preview",
+        backgroundUrl && cn("bg-cover bg-center", isMobile || bounded ? "bg-scroll" : "bg-fixed"),
+      )}
+      style={backgroundUrl ? {backgroundImage: `url(${backgroundUrl})`} : undefined}
+      data-page={authPage}
+      data-offset={effectiveOffset}
+      data-secondary={secondary}
+    >
+      {embedded ? null : <CustomStyle css={formCss} />}
+
       <div className="reforge-auth-page">
         <div className="reforge-auth-background">
-          {picker}
-          <div className="reforge-auth-content">
-            <div className="reforge-auth-header">
-              <div className="reforge-auth-logo" role="img" aria-label="LOGO">
-                LOGO
+          <div className="reforge-auth-topbar login-topbar">
+            {languagePicker}
+            <ThemeToggle className="reforge-auth-theme-toggle" />
+          </div>
+
+          <div className="reforge-auth-content login-content">
+            {showHeader ? (
+              <div className="reforge-auth-header">
+                {hideLogo ? null : (
+                  <div className="reforge-auth-logo login-logo-box">
+                    {application?.homepageUrl ? (
+                      <a
+                        href={application.homepageUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="reforge-auth-logo-link"
+                      >
+                        {logoImage}
+                      </a>
+                    ) : (
+                      logoImage
+                    )}
+                  </div>
+                )}
+                {headingNode === null ? null : <h1 className="reforge-auth-heading">{headingNode}</h1>}
               </div>
-              <h1 className="reforge-auth-heading">
-                {authPage === "signin" ? "登录智考鸭" : i18next.t("reforge:Sign up")}
-              </h1>
-            </div>
-            <div className="reforge-auth-card">
+            ) : null}
+
+            <div className={cn(
+              "reforge-auth-card login-panel",
+              panelIsLight && "theme-scope-light",
+            )}>
               {onBack ? (
                 <button type="button" className="reforge-auth-back" aria-label={i18next.t("general:Back")} onClick={onBack}>
                   <ArrowLeft aria-hidden="true" />
                 </button>
               ) : null}
-              <div className={cn("reforge-auth-form", className)}>{children}</div>
+              <div className={cn("reforge-auth-form login-form", className)}>{children}</div>
               {footer ? <div className="reforge-auth-footer">{footer}</div> : null}
             </div>
           </div>
-          <small className="reforge-auth-legal">
-            {authPage === "signup" ? (
-              <>
-                {i18next.t("reforge:By creating an account, you agree to the")}
-                <br />
-              </>
-            ) : null}
-            <a href={TERMS_OF_SERVICE_URL} target="_blank" rel="noopener noreferrer">
-              {i18next.t("reforge:Terms of Service")}
-            </a>
-            {` ${and} `}
-            <a href={PRIVACY_POLICY_URL} target="_blank" rel="noopener noreferrer">
-              {i18next.t("reforge:Privacy Policy")}
-            </a>
-          </small>
         </div>
-        {authPage === "signin" ? (
-          <div className="reforge-auth-illustration">
+
+        {secondary === "none" || bounded ? null : (
+          <div className="reforge-auth-illustration" aria-hidden={secondary === "illustration" ? true : undefined}>
             <div className="reforge-auth-illustration-inner">
-              <img src={ILLUSTRATION_URL} alt="Hokusai's The Great Wave off Kanagawa" decoding="async" />
+              {secondary === "side" ? (
+                <CustomHtml html={sidePanel} trusted={trusted} className="reforge-auth-side-html side-image" />
+              ) : (
+                <img src={ILLUSTRATION_URL} alt="" decoding="async" />
+              )}
             </div>
           </div>
-        ) : null}
+        )}
       </div>
+
+      {footerHtml ? (
+        <footer
+          id="footer"
+          className="reforge-auth-page-footer"
+          dangerouslySetInnerHTML={{__html: getSafeHtml(footerHtml, trusted)}}
+        />
+      ) : (
+        <footer id="footer" className="reforge-auth-page-footer">
+          <PoweredBy />
+        </footer>
+      )}
     </div>
   );
 }

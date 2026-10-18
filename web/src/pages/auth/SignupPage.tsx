@@ -84,8 +84,22 @@ function getReforgeSigninLink(application: {name: string; clientId?: string}): s
   return Setting.getLoginLink(application);
 }
 
+interface SuppliedApplication {
+  name?: string;
+  organization?: string;
+  organizationObj?: {countryCodes?: string[]};
+}
+
+interface SignupPageProps {
+  application?: unknown;
+  /** `theme` renders in the preview page's own frame, where the application theme applies */
+  preview?: boolean | "theme";
+}
+
 /** the application editor's live preview hands the form's own object over */
-export default function SignupPage({application: applicationProp}: {application?: any} = {}) {
+export default function SignupPage({application: applicationProp, preview: previewProp}: SignupPageProps = {}) {
+  const preview = previewProp ?? !!applicationProp;
+  const layoutPreview = preview === "theme" ? "theme" : preview;
   const params = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -108,13 +122,15 @@ export default function SignupPage({application: applicationProp}: {application?
 
   React.useEffect(() => {
     if (applicationProp) {
-      setApplication(applicationProp);
+      // supplied by the editor's preview, always an application object
+      const supplied = applicationProp as SuppliedApplication;
+      setApplication(supplied);
       setAgreed(true);
       setValues((prev) => ({
         ...prev,
-        application: applicationProp.name,
-        organization: applicationProp.organization,
-        countryCode: prev.countryCode ?? applicationProp.organizationObj?.countryCodes?.[0] ?? "",
+        application: supplied.name,
+        organization: supplied.organization,
+        countryCode: prev.countryCode ?? supplied.organizationObj?.countryCodes?.[0] ?? "",
       }));
       return;
     }
@@ -181,10 +197,13 @@ export default function SignupPage({application: applicationProp}: {application?
       : "";
 
   React.useEffect(() => {
-    if (forcedLanguage !== "" && Setting.getLanguage() !== forcedLanguage) {
+    if (preview || forcedLanguage === "") {
+      return;
+    }
+    if (Setting.getLanguage() !== forcedLanguage) {
       Setting.setLanguage(forcedLanguage);
     }
-  }, [forcedLanguage]);
+  }, [forcedLanguage, preview]);
 
   const set = (key: string, value: any) => {
     setValues((prev) => ({...prev, [key]: value}));
@@ -209,7 +228,7 @@ export default function SignupPage({application: applicationProp}: {application?
 
   if (application === null) {
     return (
-      <AuthLayout preview={!!applicationProp}>
+      <AuthLayout preview={layoutPreview}>
         <Alert variant="destructive">
           <AlertDescription>{msg ?? i18next.t("application:Failed to sign in")}</AlertDescription>
         </Alert>
@@ -225,7 +244,7 @@ export default function SignupPage({application: applicationProp}: {application?
   // without self signup, only an invitation link opens the signup form
   if (!application.enableSignUp || (application.disableSelfSignup && !values.invitationCode)) {
     return (
-      <AuthLayout preview={!!applicationProp} application={application}>
+      <AuthLayout preview={layoutPreview} application={application} authPage="signup">
         <div className="space-y-4">
           <Alert variant="warning">
             <AlertDescription>{i18next.t("application:The application does not allow to sign up new account")}</AlertDescription>
@@ -692,16 +711,16 @@ export default function SignupPage({application: applicationProp}: {application?
   // an application that lists no signup button at all still gets the default one
   const hasSignupButtonItem = signupItems.some((item: any) => item.name === "Signup button");
 
-  // the branded shell's own link back to the sign-in page: the transition
+  // the template shell's own link back to the sign-in page: the transition
   // navigates itself, and the link's URL stays the one the flow computed
   const onSigninClick = (event: React.MouseEvent<HTMLAnchorElement>) =>
     handleReforgeAuthTransitionClick(event, {navigate, application, from: "signup", enabled: !applicationProp});
 
   return (
     <AuthLayout
-      preview={!!applicationProp}
+      preview={layoutPreview}
       application={application}
-      authPage={reforge ? "signup" : undefined}
+      authPage="signup"
       wide
       hideLanguages={(languagesItem && !languagesItem.visible) || forcedLanguage !== ""}
       onLanguageChange={(key) => {

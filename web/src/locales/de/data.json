@@ -140,6 +140,16 @@
     "Other domains - Tooltip": "Weitere erlaubte Domains für diese Anwendung",
     "Page HTML": "Seiten-HTML",
     "Page HTML - Tooltip": "Benutzerdefiniertes HTML für die Hauptseite der Anwendung, mit vollständiger Kontrolle über die Seitenstruktur und den Inhalt",
+    "Choose page template": "Seitenvorlage wählen",
+    "Choose page template - description": "Die Auswahl einer Vorlage aktualisiert sofort die Vorschau. Sie wird mit der Anwendung gespeichert.",
+    "Default template": "Standardvorlage",
+    "Default template - description": "Die standardmäßigen Anmelde- und Registrierungsseiten von Casdoor.",
+    "Existing customization": "Bestehende Anpassungen",
+    "Existing customization - description": "Theme, eigenes CSS, Hintergrund, Seitenleiste sowie Kopf-, Seiten- und Fußzeile gelten weiterhin für die gewählte Vorlage. Signin-HTML und Signup-HTML ersetzen die gesamte Seite und haben Vorrang vor der Vorlage.",
+    "Page template": "Seitenvorlage",
+    "Page template - Tooltip": "Layout für die Anmelde- und Registrierungsseiten dieser Anwendung. Standard behält die normalen Casdoor-Formulare; Reforge verwendet das Reforge-Kartenlayout. Die Auswahl wird mit der Anwendung gespeichert und gilt für alle öffentlichen Authentifizierungsseiten.",
+    "Reforge template": "Reforge-Vorlage",
+    "Reforge template - description": "Das Reforge-Kartenlayout mit Logo, Theme und Hintergrund der Anwendung.",
     "Please enable \"Signin session\" first before enabling \"Auto signin\"": "Bitte aktivieren Sie zuerst \"Anmeldesitzung\", bevor Sie \"Automatische Anmeldung\" aktivieren.",
     "Please select a HTML file": "Bitte wählen Sie eine HTML-Datei aus",
     "Pop up": "Pop-up",
@@ -1422,15 +1432,9 @@
   },
   "reforge": {
     "Already have an account?": "Haben Sie ein Konto?",
-    "By creating an account, you agree to the": "Mit der Erstellung eines Kontos stimmen Sie den",
     "Create a free account": "Kostenloses Konto erstellen",
     "Don't have an account?": "Kein Konto?",
-    "Privacy Policy": "Datenschutzerklärung",
-    "Sign in": "Anmelden",
-    "Sign in to OnePrep": "Bei OnePrep anmelden",
-    "Sign up": "Registrieren",
-    "Terms of Service": "Nutzungsbedingungen",
-    "and": "und"
+    "Sign in": "Anmelden"
   },
   "resource": {
     "Copy Link": "Kopiere den Link",

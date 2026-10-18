@@ -65,7 +65,7 @@ const SIGNIN_METHOD_KEYS = new Map<string, LoginMethod>([
 
 /**
  * The items whose widgets the method tabs swap for one another: the WeChat and
- * device tabs put their panel where the credential fields were. The branded shell
+ * device tabs put their panel where the credential fields were. The template shell
  * renders them as one block so `reforge-auth.css` can reserve the method area's
  * height and keep the card from resizing on the switch.
  */
@@ -1164,7 +1164,7 @@ export default function LoginPage({type = "login", application: applicationProp,
 
   if (magicLinkSent) {
     return (
-      <AuthLayout preview={!!preview} application={application}>
+      <AuthLayout preview={!!preview} application={application} authPage="signin">
         <Alert>
           <AlertDescription>{i18next.t("login:A sign-in link has been sent to your email, it can only be opened in this browser")}</AlertDescription>
         </Alert>
@@ -1174,7 +1174,7 @@ export default function LoginPage({type = "login", application: applicationProp,
 
   if (mfa !== null) {
     return (
-      <AuthLayout preview={!!preview} application={application}>
+      <AuthLayout preview={!!preview} application={application} authPage="signin" heading={null}>
         <MfaVerify
           formValues={mfa.values}
           authParams={mfa.authParams}
@@ -1194,7 +1194,7 @@ export default function LoginPage({type = "login", application: applicationProp,
 
   if (userCodeStatus === "canceled") {
     return (
-      <AuthLayout preview={!!preview} application={application}>
+      <AuthLayout preview={!!preview} application={application} authPage="signin">
         <Alert variant="warning">
           <AlertDescription>{i18next.t("login:Device login was canceled")}</AlertDescription>
         </Alert>
@@ -1204,7 +1204,7 @@ export default function LoginPage({type = "login", application: applicationProp,
 
   if (userCodeStatus === "success") {
     return (
-      <AuthLayout preview={!!preview} application={application}>
+      <AuthLayout preview={!!preview} application={application} authPage="signin">
         <Alert>
           <AlertDescription>{i18next.t("application:Logged in successfully")}</AlertDescription>
         </Alert>
@@ -1214,7 +1214,7 @@ export default function LoginPage({type = "login", application: applicationProp,
 
   if (application.disableSignin || application.organizationObj?.disableSignin) {
     return (
-      <AuthLayout preview={!!preview} application={application}>
+      <AuthLayout preview={!!preview} application={application} authPage="signin">
         <Alert variant="warning">
           <AlertDescription>{i18next.t("application:Disable signin")}</AlertDescription>
         </Alert>
@@ -1222,8 +1222,9 @@ export default function LoginPage({type = "login", application: applicationProp,
     );
   }
 
-  // brand the plain sign-in and OAuth authorize pages only, never device/CAS/SAML
-  const reforge = (type === "login" || type === "code") && isReforgeApplication(application);
+  // the template dresses every sign-in state, including device, CAS and SAML,
+  // once the application it belongs to has chosen it
+  const reforge = isReforgeApplication(application);
   const captchaProvider = getCaptchaProvider(application);
   const passwordEnabled = Setting.isPasswordEnabled(application);
   const codeEnabled = Setting.isCodeSigninEnabled(application);
@@ -1270,7 +1271,7 @@ export default function LoginPage({type = "login", application: applicationProp,
     : application.orgChoiceMode;
   if (type === "login" && (orgChoiceMode === "Select" || orgChoiceMode === "Input")) {
     return (
-      <AuthLayout preview={!!preview} application={application}>
+      <AuthLayout preview={!!preview} application={application} authPage="signin">
         <OrganizationChoiceBox mode={orgChoiceMode} />
       </AuthLayout>
     );
@@ -1520,7 +1521,7 @@ export default function LoginPage({type = "login", application: applicationProp,
         "font-medium text-foreground underline-offset-4 hover:underline",
         reforge && "reforge-auth-link",
       );
-      // the branded shell's own link to the sign-up page: the sign-in URL is
+      // the template shell's own link to the sign-up page: the sign-in URL is
       // remembered exactly as before, and the transition navigates itself
       const onSignupClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
         Setting.storeSigninUrl();
@@ -1531,8 +1532,8 @@ export default function LoginPage({type = "login", application: applicationProp,
           key={key}
           className={cn(
             "pt-1 text-center text-sm text-muted-foreground",
-            // the app's .login-signup-link rule right-aligns the row, the reference does not
-            reforge ? "reforge-auth-signup-row" : "login-signup-link",
+            // keep the stock hook so an application's own sign-up row CSS still lands
+            reforge ? "reforge-auth-signup-row login-signup-link" : "login-signup-link",
           )}
         >
           {item.label ? null : (
@@ -1576,7 +1577,7 @@ export default function LoginPage({type = "login", application: applicationProp,
   );
 
   /**
-   * The form items of the branded shell: the method area (the widgets the tabs swap,
+   * The form items of the template shell: the method area (the widgets the tabs swap,
    * see METHOD_ITEM_NAMES) comes out as one wrapper, the rest of the items keep their
    * configured order around it. The wrapper is what `reforge-auth.css` sizes, so the
    * card stays the same height whether it holds the WeChat panel or the fields.
@@ -1619,7 +1620,7 @@ export default function LoginPage({type = "login", application: applicationProp,
     <AuthLayout
       preview={preview === "theme" ? "theme" : !!preview}
       application={application}
-      authPage={reforge ? "signin" : undefined}
+      authPage="signin"
       hideLogo={!isVisible("Logo")}
       hideLanguages={!isVisible("Languages")}
     >

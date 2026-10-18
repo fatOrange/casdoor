@@ -1,11 +1,23 @@
-// The one application whose auth pages carry the OnePrep branding. Matched on the
-// exact organization/name pair: a copy of the application under another name, or
-// another organization's application of the same name, keeps the stock layout.
+/** The page shapes the Reforge authentication shell can wrap. */
+export type AuthPage =
+  | "signin"
+  | "signup"
+  | "forget"
+  | "prompt"
+  | "consent"
+  | "result"
+  | "update-password"
+  | "init-admin"
+  | "callback"
+  | "saml";
+
+/**
+ * Whether an application chose the Reforge page template in its UI
+ * customization. Missing and unknown values keep the stock layout.
+ */
 export function isReforgeApplication(application: unknown): boolean {
-  if (typeof application !== "object" || application === null) {
-    return false;
-  }
-  const organization = "organization" in application ? application.organization : undefined;
-  const name = "name" in application ? application.name : undefined;
-  return organization === "organization_dm01" && name === "dm01-reforge-login";
+  return typeof application === "object" &&
+    application !== null &&
+    "authTemplate" in application &&
+    application.authTemplate === "reforge";
 }

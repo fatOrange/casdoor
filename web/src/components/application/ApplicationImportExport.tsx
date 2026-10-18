@@ -5,10 +5,12 @@ import {Download, Upload} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog";
 import {Textarea} from "@/components/ui/textarea";
+import {getAuthTemplate} from "@/components/application/types";
 import * as Setting from "@/lib/setting";
 
 /** Fields that represent UI/theme customization and are safe to transfer between applications. */
 const UI_FIELDS = [
+  "authTemplate",
   "logo",
   "favicon",
   "formBackgroundUrl",
@@ -32,7 +34,7 @@ export function exportApplicationJson(application: any) {
   };
   for (const key of UI_FIELDS) {
     if (application[key] !== undefined) {
-      payload[key] = application[key];
+      payload[key] = key === "authTemplate" ? getAuthTemplate(application) : application[key];
     }
   }
   copy(JSON.stringify(payload, null, 2));
@@ -71,7 +73,7 @@ export function ApplicationImportModal({application, onImport}: ApplicationImpor
     const updates: Record<string, any> = {};
     for (const key of UI_FIELDS) {
       if (Object.prototype.hasOwnProperty.call(parsed, key)) {
-        updates[key] = parsed[key];
+        updates[key] = key === "authTemplate" ? getAuthTemplate(parsed) : parsed[key];
       }
     }
 

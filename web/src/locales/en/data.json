@@ -140,6 +140,16 @@
     "Other domains - Tooltip": "Additional allowed domains for this application, used for cross-domain access control",
     "Page HTML": "Page HTML",
     "Page HTML - Tooltip": "Custom HTML for the application's main page, allowing complete control over the page structure and content",
+    "Choose page template": "Choose page template",
+    "Choose page template - description": "Selecting a template updates the preview immediately. The choice is saved with the rest of the application.",
+    "Default template": "Default template",
+    "Default template - description": "The standard Casdoor sign-in and sign-up pages.",
+    "Existing customization": "Existing customization",
+    "Existing customization - description": "Theme, custom CSS, background, side panel, header, page and footer settings still apply to the selected template. Signin HTML and Signup HTML replace the whole page and take precedence over the template.",
+    "Page template": "Page template",
+    "Page template - Tooltip": "Layout used by this application's sign-in and sign-up pages. The default keeps the standard Casdoor forms; Reforge draws the Reforge card layout. The choice is saved with the application and applies to all of its public authentication pages.",
+    "Reforge template": "Reforge template",
+    "Reforge template - description": "The Reforge card layout, branded with the application's logo, theme and background.",
     "Please enable \"Signin session\" first before enabling \"Auto signin\"": "Please enable \"Signin session\" first before enabling \"Auto signin\"",
     "Please select a HTML file": "Please select a HTML file",
     "Pop up": "Pop up",
@@ -1422,15 +1432,9 @@
   },
   "reforge": {
     "Already have an account?": "Already have an account?",
-    "By creating an account, you agree to the": "By creating an account, you agree to the",
     "Create a free account": "Create a free account",
     "Don't have an account?": "Don’t have an account?",
-    "Privacy Policy": "Privacy Policy",
-    "Sign in": "Sign in",
-    "Sign in to OnePrep": "Sign in to OnePrep",
-    "Sign up": "Sign up",
-    "Terms of Service": "Terms of Service",
-    "and": "and"
+    "Sign in": "Sign in"
   },
   "resource": {
     "Copy Link": "Copy Link",

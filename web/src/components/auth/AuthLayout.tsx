@@ -8,7 +8,7 @@ import {ThemeToggle} from "@/components/common/ThemeToggle";
 import {CustomHtml, CustomStyle} from "@/components/common/CustomHtml";
 import {ReforgeAuthLayout} from "@/components/auth/ReforgeAuthLayout";
 import {getSafeHtml, isTrustedApplication} from "@/lib/custom-html";
-import {isReforgeApplication} from "@/lib/reforge-auth";
+import {isReforgeApplication, type AuthPage} from "@/lib/reforge-auth";
 import {
   getOrganizationCookieChrome,
   useApplicationHelmet,
@@ -35,7 +35,7 @@ interface AuthLayoutProps {
   onLanguageChange?: (key: string) => void;
   /** a back arrow above the form, for a form that has steps */
   onBack?: () => void;
-  /** rendered under the panel, outside it: the "no account? sign up" line */
+  /** the row under the form, inside the panel: the "no account? sign up" line */
   footer?: React.ReactNode;
   /**
    * Rendered inside the application editor's preview: the application's theme,
@@ -45,11 +45,15 @@ interface AuthLayoutProps {
    */
   preview?: boolean | "theme";
   /**
-   * Which of the reforge application's branded pages this is. Only the reforge
-   * application paints the OnePrep shell, and only when the page names itself:
-   * every other page, and every other application, keeps this layout untouched.
+   * Which application page this is. A template that has its own page names uses
+   * it for the heading and the page marker; the stock layout ignores it.
    */
-  authPage?: "signin" | "signup";
+  authPage?: AuthPage;
+  /**
+   * The heading a page template paints above the card. `null` leaves the heading
+   * to the page's own content.
+   */
+  heading?: React.ReactNode;
 }
 
 /** The "we cannot sign you in" panel, port of auth/Util.js renderMessageLarge(). */
@@ -182,12 +186,12 @@ export function AuthLayout({
   footer,
   preview,
   authPage,
+  heading,
 }: AuthLayoutProps) {
   const themePreview = preview === "theme";
-  // the OnePrep shell paints its own light palette, so the application theme must
-  // not restyle the panel — or the console variables — underneath it
-  const reforgePage = isReforgeApplication(application) ? authPage : undefined;
-  useApplicationTheme(application, !reforgePage && (!preview || themePreview));
+  // the application's theme applies to the page itself; the editor's preview keeps
+  // it from restyling the console it is embedded in, except in its own theme frame
+  useApplicationTheme(application, !preview || themePreview);
   // an application can force the dark palette regardless of the visitor's own
   // preference, and the logo has to follow the palette that is actually painted
   const isDark = useIsDark();
@@ -215,49 +219,65 @@ export function AuthLayout({
     return <BlockedMessage message={ipRestriction} />;
   }
 
-  // the reforge application's two branded pages paint the OnePrep shell around
-  // their own form markup; every other page keeps this layout, and the IP
-  // restriction above has already had its say
-  if (reforgePage) {
-    return (
-      <ReforgeAuthLayout
-        application={application}
-        authPage={reforgePage}
-        className={className}
-        footer={footer}
-        onLanguageChange={onLanguageChange}
-        onBack={onBack}
-        preview={!!preview}
-      >
-        {children}
-      </ReforgeAuthLayout>
-    );
-  }
-
-  // the customized form styling is meant for the standalone page, an embedded
-  // one keeps the host page's own look, as the antd pages did
+  // a customized form stays inside the standalone page; an embedded one keeps
+  // the host page's own look, as the antd pages did
   const embedded = Setting.inIframe() && !themePreview;
   const backgroundUrl = embedded
     ? undefined
     : (isMobile ? application?.formBackgroundUrlMobile : application?.formBackgroundUrl);
   // formOffset: 1 left, 2 center, 3 right, 4 center with the side panel
   const offset = embedded || isMobile ? 2 : (application?.formOffset ?? 2);
-  const sidePanel = offset === 4 && application?.formSideHtml;
+  const sidePanel = offset === 4 ? application?.formSideHtml || undefined : undefined;
   // on a phone the panel *is* the page, so its border and shadow only add noise
   // — unless it has to hold itself off a background image
   const bleed = isPhone && !backgroundUrl;
   // a bled panel paints no background of its own — index.css drops the one the
   // application's form CSS asked for along with the rest of its card
   const panelIsLight = isDark && !bleed && !!panelBackground && isLightColor(panelBackground);
+  const reforge = isReforgeApplication(application);
+  // the template keeps its card on a phone, so its own panel decides the logo
+  const templatePanelIsLight = isDark && !!panelBackground && isLightColor(panelBackground);
 
   // the application's logo and the organization's are different things, so the
   // dark twin painted here is the application's own, never the organization's
   const logo = Setting.getThemedLogo(
     application?.logo || cookieChrome.logo,
     application?.logoDark || cookieChrome.logoDark,
-    [isDark && !panelIsLight ? "dark" : "light"],
+    [isDark && !(reforge ? templatePanelIsLight : panelIsLight) ? "dark" : "light"],
   );
   const footerHtml = application?.footerHtml;
+
+  // every application-aware page of an application that chose the template gets
+  // its shell, whatever the page's own state
+  if (reforge) {
+    return (
+      <ReforgeAuthLayout
+        application={application}
+        authPage={authPage ?? "signin"}
+        heading={heading}
+        className={className}
+        footer={footer}
+        hideLogo={hideLogo}
+        hideLanguages={hideLanguages}
+        onLanguageChange={onLanguageChange}
+        onBack={onBack}
+        preview={!!preview}
+        bounded={!!preview && !themePreview}
+        logo={logo}
+        formCss={formCss}
+        backgroundUrl={backgroundUrl}
+        offset={offset}
+        sidePanel={sidePanel}
+        footerHtml={footerHtml}
+        trusted={trusted}
+        embedded={embedded}
+        panelIsLight={templatePanelIsLight}
+      >
+        {children}
+      </ReforgeAuthLayout>
+    );
+  }
+
   const footerClassName = cn(
     "shrink-0 text-center text-xs text-muted-foreground",
     backgroundUrl ? "mx-auto mb-4 w-fit max-w-full rounded-full bg-background/80 px-4 py-1.5 backdrop-blur" : "py-6",

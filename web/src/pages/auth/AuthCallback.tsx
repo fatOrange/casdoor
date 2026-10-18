@@ -369,7 +369,7 @@ export default function AuthCallback() {
 
   if (mfa !== null) {
     return (
-      <AuthLayout application={application}>
+      <AuthLayout application={application} authPage="callback" heading={null}>
         <MfaVerify
           formValues={mfa.values}
           authParams={mfa.authParams}
